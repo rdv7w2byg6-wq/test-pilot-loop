@@ -432,4 +432,4 @@ The gap between Tier 1 and Tier 3 is a **quantitative measure of your UX quality
 
 *UX Testing Phase Protocol v0.1.0*
 *Part of the Test Pilot Loop — Flight Deck by Huan Su.*
-*Three agents. Three knowledge levels. One truth about your UX.*
+*One orchestrator. Three knowledge levels. One truth about your UX.*

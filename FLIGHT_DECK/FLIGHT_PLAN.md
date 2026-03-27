@@ -116,18 +116,18 @@ Cowork accesses the Obsidian vault by **reading and writing .md files directly**
 
 | Mount Path | Purpose | Required By |
 |------------|---------|-------------|
-| `~/Projects/[ProjectName]/` | Project source code | All agents |
-| `~/Projects/[ProjectName]/FLIGHT_PLAN.md` | Shared communication hub | All agents |
-| `~/Projects/[ProjectName]/FLIGHT_DECK/AUTOPILOT.md` | Claude Code instructions | Claude Code, Second Builder |
-| `~/Projects/[ProjectName]/PRD.md` | Product requirements | All agents |
-| `~/Projects/[ProjectName]/AUDIT_SCREENSHOTS/` | Test evidence | Cowork Opus |
+| `[ProjectRoot]/` | Project source code | All agents |
+| `[ProjectRoot]/FLIGHT_DECK/FLIGHT_PLAN.md` | Shared communication hub | All agents |
+| `[ProjectRoot]/FLIGHT_DECK/AUTOPILOT.md` | Claude Code instructions | Claude Code, Second Builder |
+| `[ProjectRoot]/PRD.md` | Product requirements | All agents |
+| `[ProjectRoot]/AUDIT_SCREENSHOTS/` | Test evidence | Cowork Opus |
 | `~/YourProject-SecondBrain/` | Obsidian vault (persistent memory) | Cowork Opus |
 
 **Pre-flight checklist before starting any session:**
 1. ✅ Project folder mounted in Cowork
 2. ✅ Obsidian vault folder mounted in Cowork
-3. ✅ FLIGHT_PLAN.md exists in project root
-4. ✅ CLAUDE.md exists in project root (imports FLIGHT_DECK/AUTOPILOT.md)
+3. ✅ `FLIGHT_DECK/FLIGHT_PLAN.md` exists in project
+4. ✅ `CLAUDE.md` exists in project root (imports FLIGHT_DECK/AUTOPILOT.md)
 5. ✅ Claude Code / Second Builder sessions can read/write the project folder
 6. ✅ AUDIT_SCREENSHOTS/ folder exists
 
@@ -385,7 +385,7 @@ For ⚪ Trivial tasks, Opus fast-approves during patrol check — no full test m
 - After deciding: updates task queue, writes feedback, sets `ESCALATE OPUS: NO`
 - Writes key decisions to Obsidian vault `_Orchestration/decisions-log.md`
 - Logs all direct terminal interventions in AGENT OUTPUT LOG
-- **TEST PILOT:** After approving any 🟡 Medium or 🔴 High risk task, Cowork Opus test-pilots the app/project like a real human (see TEST PILOT PROTOCOL below)
+- **TEST PILOT:** After approving any 🟡 Medium or 🔴 High risk task, Cowork Opus test-pilots the app through computer use — clicking, typing, and navigating (see TEST PILOT PROTOCOL below)
 - **ONLY agent that can**: restructure task queue, reassign tasks, change architecture, resolve conflicts, directly control other agent terminals, set risk levels
 
 ### 🟡 Opus Patrol Mode (10-Minute Check — ALL Agents + Fast-Approver)
@@ -468,8 +468,8 @@ For ⚪ Trivial tasks, Opus fast-approves during patrol check — no full test m
 ### What "Test Driving" Means
 Cowork Opus uses computer use to:
 1. **Launch the app** — open Xcode simulator, run the build, or open the project in its target environment
-2. **Use it like a real human** — tap buttons, scroll, navigate between screens, enter data, try the feature that was just built
-3. **Try edge cases a user would try** — what happens with empty input? With very long text? With rapid tapping? Rotating the device?
+2. **Interact through computer use** — tap buttons, scroll, navigate between screens, enter data, try the feature that was just built
+3. **Try edge cases** — what happens with empty input? With very long text? With rapid tapping? Rotating the device?
 4. **Follow the user journey** — don't just test the new feature in isolation. Walk through the full flow a real user would take: open app → create project → use the feature → review results
 5. **Look at it visually** — is the UI aligned? Do colors look right? Does the layout break on different content?
 6. **Try to break it** — a real QA human tries to find bugs, not confirm the happy path
@@ -480,7 +480,7 @@ Cowork Opus uses computer use to:
 2.  Opus reviews code/output in AGENT OUTPUT LOG
 3.  Opus sets task status → 🧪 Test-Piloting
 4.  Opus launches the app via computer use
-5.  Opus interacts with the app as a real user:
+5.  Opus interacts with the app through computer use:
     ┌──────────────────────────────────────────────┐
     │  • Open the app / navigate to the feature    │
     │  • Try the happy path (expected use)          │
@@ -1160,7 +1160,7 @@ When the single `FLIGHT_PLAN.md` file starts causing problems (two agents writin
 9. **Append only.** Never delete or overwrite another agent's entries in any log section.
 10. **When in doubt, escalate.** Set `ESCALATE OPUS: YES` rather than making an uncertain decision.
 11. **Opus patrols every 10 minutes.** ALL agents are monitored. No agent operates unwatched — even in autopilot.
-12. **Opus test-pilots after every 🟡/🔴 task.** The app must work like a real user would expect before a task is approved.
+12. **Opus test-pilots after every 🟡/🔴 task.** The app must be usable through computer use before a task is approved.
 13. **Anyone can pull the kill switch.** If the system is going wrong, set `GLOBAL STOP: 🛑 FROZEN`. This overrides ALL modes including autopilot.
 14. **Autopilot is not unsupervised.** Opus still applies full governance. Autopilot means Opus makes the calls the human director would make — not that governance is relaxed. Every autopilot decision is logged with reasoning and confidence for the human director to review later.
 

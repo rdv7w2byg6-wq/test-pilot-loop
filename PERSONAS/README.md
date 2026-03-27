@@ -4,7 +4,7 @@ Behavioral prompt packs for the Test Pilot Loop framework.
 
 These are **Claude Code subagent files** — structured persona prompts that shape how each agent evaluates your app. They define the tester's mindset, behavioral rules, and report format.
 
-> **Note:** These persona files use Claude Code's `tools: Read, Bash, Glob, Grep` for code-side evaluation and report generation. For live UI testing through computer use (screenshots, mouse, keyboard), the orchestrator (Cowork Opus) drives the app directly using its own computer-use capabilities. The personas provide the behavioral rules; Cowork provides the eyes and hands.
+> **Canonical mode:** The default testing method is one Cowork Opus orchestrator that drives the app through computer use and adopts each persona's behavioral rules in sequential passes. Persona subagent files are an **optional helper pattern** — they run in Claude Code using `tools: Read, Bash, Glob, Grep` for code-side evaluation and report generation, not for direct UI interaction. The orchestrator provides the eyes and hands; the personas provide the behavioral constraints.
 
 ## Quick Install
 

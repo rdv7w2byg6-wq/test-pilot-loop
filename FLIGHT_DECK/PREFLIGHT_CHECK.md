@@ -1,6 +1,6 @@
 # ✅ Preflight Check — Test Pilot Configuration
 ## Customize Your Testing — Everything Is Adjustable
-**Drop this file into your project root as `PREFLIGHT_CHECK.md`. The Test Pilot reads it before every session.**
+**Lives at `FLIGHT_DECK/PREFLIGHT_CHECK.md` in your project. The Test Pilot reads it before every session.**
 
 ---
 

@@ -72,6 +72,8 @@ Cowork Opus stays open as the brain. After each build, it test-drives the app th
 
 **One session. No switching. Continuous feedback loop.**
 
+> **Canonical mode:** One Cowork Opus orchestrator drives the app through computer use and runs all evaluation passes sequentially. Persona subagent files (in `PERSONAS/`) are an optional helper pattern for code-side evaluation — the orchestrator is the default.
+
 - **Personas** model **who** the tester is (expert, everyday, struggling, accessibility)
 - **Knowledge tiers** model **what** the tester knows (nothing, user manual, full PRD)
 

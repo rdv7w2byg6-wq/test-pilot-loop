@@ -177,10 +177,12 @@ Every test session evaluates **six dimensions.** The Test Pilot scores each on a
 
 > **For the step-by-step execution protocol** — how to inspect each screen, inventory elements, form predictions, and evaluate actions — see [TEST_FLIGHT_PROTOCOL.md](TEST_FLIGHT_PROTOCOL.md). This section covers the persona rotation and session structure; the protocol covers the screen-by-screen testing cycle (SEE→INVENTORY→PREDICT→ACT→EVALUATE).
 
-### How to Spawn Test Pilot Personas
+### How to Run Persona-Based Testing
 
-**Option A: Sequential persona rotation (each persona tests one at a time)**
-Since each Test Pilot must operate the live app through computer use, personas run **one at a time, sequentially**. Each persona gets a fresh interaction with the app.
+> **Canonical mode (default):** Cowork Opus drives the app through computer use and adopts each persona's behavioral rules in sequential passes. **Persona subagents are an optional helper pattern** — they run in Claude Code for code-side evaluation and report generation, not for direct UI interaction.
+
+**Option A: Cowork Opus sequential rotation (default — recommended)**
+Opus adopts each persona sequentially, re-reading the persona's behavioral rules before each run. One agent drives the UI through computer use for all passes.
 ```
 Test [feature] sequentially with each persona:
   Run 1: @test-pilot-alex — test as Power User → capture report

@@ -30,11 +30,11 @@ Each Claude model thinks differently. That difference IS the testing:
 | **Sonnet** | Average user | Confusing labels, missing feedback after actions, broken happy path, unclear next steps |
 | **Haiku** | Quick user | Obvious breaks, unclear purpose, missing basic functionality, "I have no idea what this does" |
 
-You don't need persona files. The model's cognitive style IS the persona.
+You don't need persona files. Each model's processing depth serves as a proxy for different tester perspectives.
 
-- Opus overthinks — catches what a careful user would notice
-- Sonnet follows the flow — catches what a normal user hits
-- Haiku skims — catches what someone who gives up in 10 seconds would miss
+- Opus processes deeply — catches design flaws a careful evaluator would flag
+- Sonnet follows the flow — catches what a typical evaluation pass surfaces
+- Haiku processes quickly — catches what a shallow first-impression scan reveals
 
 ---
 

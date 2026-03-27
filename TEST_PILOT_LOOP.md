@@ -73,7 +73,7 @@ Same Opus instance, but each run is **prompted with only that tier's allowed kno
 
 ## The Communication Channel
 
-Cowork Opus and the code agent communicate through a shared file: `FLIGHT_PLAN.md` (or any shared .md file both can read/write).
+Cowork Opus and the code agent communicate through a shared file: `FLIGHT_DECK/FLIGHT_PLAN.md` (or any shared .md file both can read/write).
 
 ```
 CODE AGENT writes:
@@ -136,7 +136,7 @@ Launch both apps at the same time on the same Mac:
 
 1. **Open Cowork with Opus** — give it the standing patrol instruction (below)
 2. **Open Claude Code** (or any AI coding agent) — start building
-3. **Create `FLIGHT_PLAN.md`** in your project root — this is the shared communication file
+3. **Create `FLIGHT_DECK/FLIGHT_PLAN.md`** in your project — this is the shared communication file
 
 ### The Opus Patrol Instruction
 
