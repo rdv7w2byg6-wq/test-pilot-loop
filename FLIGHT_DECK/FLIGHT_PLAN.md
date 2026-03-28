@@ -1,113 +1,63 @@
-# 🧠 Flight Plan — Multi-Agent Orchestration Protocol v0.1.0
-**Cowork (Opus) is THE BRAIN — patrol, testing, and decisions all in one model.**
-**Now with: Ralph Wiggum Build Loop · Test Pilot Validation Gate · Kill Switch · Confidence Scores · Opus 10-Min Patrol**
+# Flight Plan — Dual-Patrol Coordination Document v0.2.0
+
+> **Two agents. One shared file. No direct commands.**
+> Both agents patrol this document independently. Neither controls the other.
+> Communication happens exclusively through STATUS, NEXT_ACTION, and FINDINGS.
 
 ---
 
 ## 🏗️ ARCHITECTURE OVERVIEW
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                     HUMAN DIRECTOR (You)                        │
-│              Triggers Cowork manually or via 10-min patrol               │
-└──────────────────────────┬──────────────────────────────────────┘
-                           │
-┌──────────────────────────▼──────────────────────────────────────┐
-│              🟣 COWORK — OPUS (THE BRAIN + TEST PILOT)          │
-│                                                                 │
-│   • Controls Ralph Wiggum build loops (writes prompts)          │
-│   • Runs Test Pilot validation after each build cycle           │
-│   • Feeds UX findings back into Ralph for next iteration        │
-│   • Reads/writes Obsidian vault for persistent memory           │
-│   • Makes ALL architectural and design decisions                │
-│   • WAKES via: 10-min patrol trigger OR human manual trigger          │
-│                                                                 │
-│   THE COMBINED ENGINE:                                          │
-│   ┌─────────────────────────────────────────────────────────┐   │
-│   │ 🔁 RALPH WIGGUM LOOP (Build) → 🧪 TEST PILOT (Validate)│   │
-│   │    Code passes? ──NO──→ Ralph iterates                  │   │
-│   │    UX passes?   ──NO──→ findings fed back → Ralph again │   │
-│   │    BOTH pass?   ──YES─→ ✅ DONE                        │   │
-│   └─────────────────────────────────────────────────────────┘   │
-│                                                                 │
-│   COMMUNICATION CHANNELS:                                       │
-│   📝 Write feedback to FLIGHT_PLAN.md (shared file)             │
-│   🖥️  Then Cmd+Tab to Terminal → type instructions to code agent │
-│                                                                 │
-└──┬──────────┬──────────┬──────────┬─────────────────────────────┘
-   │ .md+term │ .md+term │ .md      │ .md
-   ▼          ▼          ▼          ▼
-┌──────┐ ┌──────┐ ┌──────────┐ ┌──────────┐
-│🔵 CC │ │🟢 B2 │ │🟡 Patrol │ │🧪 Test  │
-│Build │ │Build │ │ Check    │ │ Pilot   │
-│Ralph │ │Ralph │ │ ALL agts │ │ App Test│
-│Loop  │ │Loop  │ │ 10-min   │ │ UX+Func │
-└──────┘ └──────┘ └──────────┘ └──────────┘
+┌──────────────────────────────────────────────────┐
+│              HUMAN DIRECTOR (You)                 │
+│   Starts both agents. Final authority.            │
+│   Intervenes on ESCALATE_TO_HUMAN.                │
+└─────────────────────┬────────────────────────────┘
+                      │ launches separately
+          ┌───────────┴───────────┐
+          ▼                       ▼
+┌──────────────────┐   ┌──────────────────┐
+│  CLAUDE CODE     │   │  COWORK          │
+│  (Builder)       │   │  (Test Pilot)    │
+│                  │   │                  │
+│  Runs in Terminal│   │  Runs in Cowork  │
+│  Builds code     │   │  Tests app via   │
+│  Fixes bugs      │   │  computer use    │
+│  Runs xcodebuild │   │  Finds UX bugs   │
+│                  │   │                  │
+│  Patrols this    │   │  Patrols this    │
+│  file every      │   │  file every      │
+│  10 minutes      │   │  10 minutes      │
+└────────┬─────────┘   └────────┬─────────┘
+         │                      │
+         └──────────┬───────────┘
+                    ▼
+         ┌────────────────────┐
+         │  FLIGHT_PLAN.md    │
+         │  (this file)       │
+         │                    │
+         │  The only channel. │
+         │  No terminal ctrl. │
+         │  No direct cmds.   │
+         └────────────────────┘
 ```
 
-### 📡 Communication Channel Details
+**Why no direct control:** Cowork cannot type into Terminal (platform safety boundary — Terminal is click-tier only). This is not a workaround — the Dual-Patrol architecture is inherently more resilient than direct orchestration. Each agent can fail independently without corrupting the other's state.
 
-**📝 PRIMARY — Shared .md File (Normal Operations)**
-Cowork writes all feedback, task assignments, and direction into `FLIGHT_PLAN.md`. Agents are responsible for reading the file before every action. This is the default channel for all routine communication.
-
-**🖥️ FALLBACK — Direct Terminal Control (Override)**
-When the .md channel fails — agent is stuck, not reading the file, hung process, or urgent intervention needed — Cowork uses computer use to:
-1. Switch to the agent's terminal window/tab
-2. Type instructions directly into the Claude Code or Second Builder CLI session
-3. Issue commands: interrupt current work, redirect, restart, or provide context
-
-**When to use fallback:**
-- Agent has been `⏳ Awaiting Review` but hasn't picked up feedback after file update
-- Agent appears stuck in a loop or producing incorrect output
-- Urgent redirect needed mid-execution (e.g., "STOP — wrong branch")
-- Need to pass context that's too complex for the .md file (e.g., paste error logs)
-
-**Fallback logging:** When Cowork uses direct terminal control, it must log the intervention in the AGENT OUTPUT LOG:
-```
-[YYYY-MM-DD HH:MM] — Opus DIRECT TERMINAL INTERVENTION
-Target Agent: [Claude Code / Second Builder]
-Reason: [why .md channel was insufficient]
-Action Taken: [what was typed/commanded]
-Result: [agent response]
-```
+**There is no fallback channel.** If file-based communication fails (agent not reading, stuck, crashed), the response is ESCALATE_TO_HUMAN. The human director restarts the stuck agent, which then reads this file to restore context.
 
 ---
 
-## 🧠 SECOND BRAIN — OBSIDIAN VAULT
+## 📝 OPTIONAL — OBSIDIAN VAULT FOR CROSS-SESSION MEMORY
 
-> Cowork's project memory is session-scoped and volatile.
-> A persistent knowledge base (e.g., an Obsidian vault, a shared folder of .md files, or any durable notes system) is the **durable memory** that persists across all sessions.
+Obsidian vault is recommended for cross-session memory but not required for the core Dual-Patrol loop. Both agents can operate effectively using FLIGHT_PLAN.md alone.
 
-### Vault Structure (Example)
-```
-📁 YourProject-SecondBrain/            (Obsidian vault root)
-├── 📁 _Orchestration/
-│   ├── decisions-log.md               ← Every Opus decision with reasoning
-│   ├── architecture-decisions.md      ← ADRs (Architecture Decision Records)
-│   ├── lessons-learned.md             ← What went wrong, what worked
-│   └── agent-performance.md           ← Which agent excels at what
-├── 📁 ProjectA/
-│   ├── current-state.md               ← Latest build status, known issues
-│   ├── technical-debt.md              ← Deferred fixes, TODOs
-│   └── session-handoffs.md            ← Context for resuming work
-├── 📁 ProjectB/
-│   ├── current-state.md
-│   ├── technical-debt.md
-│   └── session-handoffs.md
-└── 📁 ProjectC/
-    ├── current-state.md
-    ├── technical-debt.md
-    └── session-handoffs.md
-```
-
-### Second Brain Protocol
-1. **Session Start**: Cowork reads `_Orchestration/` + relevant project `current-state.md` to restore full context
-2. **During Session**: Cowork writes decisions and findings in real time to the vault
-3. **Session End**: Cowork writes a `session-handoffs.md` entry summarizing: what was done, what's next, any blockers, and open questions
-4. **Cross-Session Continuity**: Any agent spawned by Cowork receives relevant vault context in its spawn prompt
-
-### Cowork Vault Access
-Cowork accesses the Obsidian vault by **reading and writing .md files directly** in the vault folder via computer use. No MCP plugin required — Cowork opens, reads, and edits files natively through the desktop environment.
+If you maintain an Obsidian vault:
+- Cowork reads `_Orchestration/decisions-log.md` on session start to restore context
+- Cowork writes key decisions to the vault during the session
+- When a session ends, write a `session-handoffs.md` entry for the next session's context
+- Vault is optional — FLIGHT_PLAN.md is the single source of truth
 
 ---
 
@@ -167,386 +117,299 @@ This means one model handles both lightweight patrol and deep testing. No separa
 ---
 
 ## 📊 STATUS BLOCK
-> ⚡ Opus checks this section every 10 minutes during patrol mode. All agents check this before starting work.
-> 🛑 ALL agents check GLOBAL STOP before EVERY action. If FROZEN → do nothing.
-> ✈️ ALL agents check PILOT MODE to know whether the human director is available for escalation.
+> Both agents read this section FIRST on every patrol.
 
 ```
-GLOBAL STOP     : [ACTIVE / 🛑 FROZEN]
-PILOT MODE      : [👨‍✈️ SUPERVISED / ✈️ AUTOPILOT / 🛬 AUTOPILOT-SAFE]
-PROJECT         : [Your Project Name]
-LAST UPDATED    : [YYYY-MM-DD HH:MM]
-CURRENT PHASE   : [Planning | Building | Auditing | Testing | Review | Complete]
-ACTIVE AGENTS   : [Claude Code | Second Builder | Cowork Opus]
-BLOCKING ISSUE  : [None | Describe]
-ESCALATE OPUS   : [YES | NO]
-WAKE REASON     : [Opus patrol trigger | Human manual | Scheduled review]
-NEXT PATROL CHECK: [YYYY-MM-DD HH:MM]
-AUTOPILOT UNTIL : [YYYY-MM-DD HH:MM / Indefinite / N/A]
-```
-
-### 🛑 KILL SWITCH — GLOBAL STOP
-**Any agent or the human director can set `GLOBAL STOP: 🛑 FROZEN` at any time.**
-
-When FROZEN:
-- ALL agents immediately stop current work
-- No new tasks may be started
-- No auto-proceeding
-- Agents write their current state to AGENT OUTPUT LOG with status `🛑 Frozen`
-- Opus patrol continues but takes NO routing actions — only logs status
-- Only Cowork Opus or the human director can set `GLOBAL STOP: ACTIVE` to resume
-
-When to freeze:
-- System going in wrong architectural direction
-- Agents caught in infinite loop or cascading errors
-- Need to rethink approach before more work is wasted
-- Any agent detects it's producing output that conflicts with PRD
-- The human director needs to step away and doesn't want agents running unsupervised (use this OR autopilot)
-
-### ✈️ PILOT MODE — Human Supervision Level
-
-The human director sets this before stepping away. It controls how much autonomy Cowork Opus has.
-
-#### 👨‍✈️ SUPERVISED (Default)
-Human director is available. Normal operations.
-- Cowork Opus escalates to the human director per the escalation matrix
-- Human director approves S1/S2 critical bugs, design decisions, priority conflicts
-- Full governance — nothing ships without human awareness
-
-#### ✈️ AUTOPILOT
-Human director is away. Cowork Opus has full authority.
-- Cowork Opus makes ALL decisions that would normally escalate to the human director
-- Opus handles S1/S2 bugs on its own — chooses the safest fix approach
-- Opus makes design/UX decisions based on PRD and existing patterns
-- Opus can approve, reject, reassign, and restructure anything
-- **Guardrails still active:**
-  - Kill switch can still fire (any agent can freeze the system)
-  - Confidence < 60% on any decision → Opus logs it but HOLDS the task for the human director's return instead of deciding
-  - No deployment to production / no irreversible actions
-  - All decisions logged to Obsidian vault with `[AUTOPILOT DECISION]` tag so the human director can review later
-  - Opus 10-minute patrol continues — monitoring doesn't stop
-- **When autopilot expires** (reaches `AUTOPILOT UNTIL` time):
-  - Mode automatically reverts to 👨‍✈️ SUPERVISED
-  - Any held tasks are queued for human review
-  - Opus writes a summary: "Autopilot session complete. X tasks completed, Y decisions made, Z items held for your review."
-
-#### 🛬 AUTOPILOT-SAFE (Conservative Autopilot)
-Human director is away but wants minimal risk.
-- Cowork Opus can only proceed with 🟢 Low and ⚪ Trivial tasks
-- ALL 🟡 Medium and 🔴 High tasks are HELD until the human director returns
-- S1/S2 bugs → Opus sets `GLOBAL STOP: 🛑 FROZEN` and waits for the human director
-- S3-S5 bugs → Opus sends to build agent, fixes proceed normally
-- No architectural decisions, no design changes, no new task creation
-- Essentially: "keep doing easy work, stop if anything hard comes up"
-
-### How the Human Director Activates Autopilot
-
-**Before stepping away:**
-```
-Human director sets in STATUS BLOCK:
-  PILOT MODE: ✈️ AUTOPILOT
-  AUTOPILOT UNTIL: 2026-03-27 14:00
-
-Or conservative:
-  PILOT MODE: 🛬 AUTOPILOT-SAFE
-  AUTOPILOT UNTIL: 2026-03-27 14:00
-```
-
-**When returning:**
-```
-Human director sets:
-  PILOT MODE: 👨‍✈️ SUPERVISED
-  AUTOPILOT UNTIL: N/A
-```
-Then reads the autopilot summary in the OPUS DECISION LOG and reviews any held items.
-
-### Autopilot Decision Logging
-
-Every decision Opus makes in autopilot mode gets a special tag in the Obsidian vault:
-
-```
-[YYYY-MM-DD HH:MM] — [AUTOPILOT DECISION]
-Mode: ✈️ AUTOPILOT / 🛬 AUTOPILOT-SAFE
-Decision: [what was decided]
-Normally would escalate because: [reason this would go to the human director]
-Opus reasoning: [why Opus chose this approach]
-Confidence: [0-100%]
-Reversible: [YES — can be undone / NO — permanent]
-Held for human review: [YES — Opus wasn't confident enough / NO — Opus proceeded]
-```
-
-### Autopilot Summary (Written When Mode Ends)
-
-```
-[YYYY-MM-DD HH:MM] — AUTOPILOT SESSION SUMMARY
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Duration: [start time] → [end time]
-Mode: ✈️ AUTOPILOT / 🛬 AUTOPILOT-SAFE
-
-Tasks completed: [count]
-Tasks held for human review: [count]
-Bugs found: [count by severity]
-Bugs fixed: [count]
-Test pilots performed: [count]
-Decisions made that would normally escalate: [count]
-
-KEY DECISIONS (review these):
-  1. [Decision — e.g., "Chose approach B for BUG-T004-001 (mesh rendering)"]
-  2. [Decision — e.g., "Approved Second Builder plan for T008 without human review"]
-  3. [Decision — e.g., "Held T009 — confidence 55%, needs your input"]
-
-ITEMS REQUIRING YOUR REVIEW:
-  • T009 — [description, why it was held]
-  • BUG-T002-005 — [S2 Critical, Opus fixed it but wants your validation]
-
-OVERALL HEALTH:
-  System stable: YES / NO
-  Any kill switch triggers: [none / describe]
-  Dimension score trend: [improving / stable / declining]
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CURRENT_PHASE:  [build | test | fix | retest | complete | failed]
+ASSIGNED_TO:    [claude_code | cowork | human]
+STATUS:         [see STATUS CODES below]
+LAST_UPDATED:   [YYYY-MM-DD HH:MM]
+UPDATED_BY:     [claude_code | cowork | human]
+ITERATION:      [1, 2, 3...]
 ```
 
 ---
 
-## 📋 PROJECT BRIEF
+## STATUS CODES
 
-- **Project:**
-- **PRD Location:** `[path/to/PRD.md]`
-- **Goal:**
-- **Platform:** [iOS / macOS / Windows PC / Remote Desktop]
-- **Obsidian Vault:** `[path/to/YourProject-SecondBrain/]`
-- **Mounted Folders:** [list of mounted paths]
-- **Success Criteria:**
+### Claude Code reads these — they trigger builder actions
+
+| Code | Meaning | What Claude Code does |
+|------|---------|----------------------|
+| `BUILD_REQUESTED` | Initial build or rebuild needed | Run build command. If success, launch app, set `READY_FOR_TEST`. If fail, log error in FINDINGS, keep status. |
+| `FIX_REQUESTED` | Cowork found bugs | Read FINDINGS (open items). Fix each bug. Rebuild. If success, set `READY_FOR_TEST`. If fix is unclear, write question in ACTIONS_TAKEN, set `ESCALATE_TO_HUMAN`. |
+| `RETEST_PASSED` | All tested items passed | Do nothing. Wait for Cowork to advance to next persona or set `LOOP_COMPLETE`. |
+| `LOOP_COMPLETE` | All personas passed | Do nothing. Celebration. |
+
+### Cowork reads these — they trigger testing actions
+
+| Code | Meaning | What Cowork does |
+|------|---------|-----------------|
+| `READY_FOR_TEST` | App is built and running | Open the app via computer use. Run ACTIVE_PERSONA test. Evaluate all screens/flows. Write results to FINDINGS. If bugs found, set `FIX_REQUESTED`. If all pass, set `RETEST_PASSED`. |
+| `RETEST_REQUESTED` | Fixes applied, verify them | Open the app. Retest ONLY the items marked `fixed` in FINDINGS. If all verified, mark them `verified`, set `RETEST_PASSED`. If any still broken, update FINDINGS, set `FIX_REQUESTED`. |
+| `AWAITING_TESTER` | App idle, waiting for pickup | Same as `READY_FOR_TEST` — begin testing. |
+
+### Both agents read these — they stop normal work
+
+| Code | Meaning | What both agents do |
+|------|---------|-------------------|
+| `ESCALATE_TO_HUMAN` | Timeout exceeded or agent stuck | Stop all work. Write current state to ACTIONS_TAKEN. Wait for human to update STATUS. |
+| `LOOP_COMPLETE` | Ship it | Stop. All personas passed. Log final summary to ACTIONS_TAKEN. |
 
 ---
 
-## 🎯 TASK QUEUE
-> **Only Cowork Opus updates this table.** Opus updates Status during patrol checks.
-> Agents MUST NOT self-assign or start tasks not listed here.
+## NEXT ACTION
 
-| ID   | Task | Assigned To | Status             | Risk Level | Depends On | Notes |
-|------|------|-------------|--------------------|------------|------------|-------|
-| T001 |      | Claude Code | 🔲 Pending         | 🟢 Low     |            |       |
-| T002 |      | Second Builder       | 🔲 Pending         | 🟡 Medium  |            |       |
-| T003 |      | Cowork Test | 🔲 Pending         | —          |            |       |
+> **Plain language instructions. The agent who updates STATUS also writes the next action for the other agent.**
+> This eliminates ambiguity — each agent knows exactly what to do on pickup.
 
-**Status keys:**
-- 🔲 Pending — Not started, waiting for assignment
-- 📋 Planning — Agent is writing plan (Second Builder default entry state)
-- 🔄 In Progress — Actively building/executing
-- 🟢 Auto-Proceeding — Claude Code auto-advancing through low-risk sequential tasks
-- ⏳ Awaiting Review — **WORK COMPLETE. AGENT STOPPED. Waiting for Cowork Opus feedback.**
-- 🧪 Test-Piloting — Cowork Opus is currently testing this feature live
-- ✅ Approved — Cowork Opus reviewed AND test-piloted successfully
-- 🔁 Revision Needed — Cowork Opus reviewed/tested and sent back with comments
-- ❌ Blocked — Cannot proceed, needs escalation
-- 🔍 Under Review — Cowork Opus is currently reviewing code/output
+```
+NEXT_ACTION_FOR_CLAUDE_CODE:
+  [e.g., "Fix the 3 bugs in FINDINGS items 1-3. The name parser regex
+   (item 1) is highest priority — see root cause in the description.
+   Rebuild with xcodebuild, launch the app, then set STATUS to
+   READY_FOR_TEST."]
 
-**Risk levels (set by Cowork Opus when creating tasks):**
-- ⚪ Trivial — Comment fixes, import ordering, logging changes, typos, formatting. **Opus fast-approves during patrol — no deep test needed.**
-- 🟢 Low — Routine, no architectural impact, single file, well-defined. Claude Code may auto-proceed. Opus batch-reviews.
-- 🟡 Medium — Multiple files, some design judgment needed. Requires Opus review + test pilot before next task.
-- 🔴 High — Architectural change, new patterns, cross-module impact. Full stop + Opus review + test pilot.
+NEXT_ACTION_FOR_COWORK:
+  [e.g., "App is rebuilt with fixes for items 1-3. Retest only those
+   items: verify Sharick name displays without parenthetical, verify
+   context menu has 5 items, verify undo toast appears. Update FINDINGS
+   status for each. Set STATUS to RETEST_PASSED or FIX_REQUESTED."]
+```
 
-### ⚪ PATROL FAST-APPROVE (Trivial Tasks)
-For ⚪ Trivial tasks, Opus fast-approves during patrol check — no full test mode needed:
-1. Claude Code completes ⚪ task → writes output → sets `⏳ Awaiting Review`
-2. Opus sees it on next 10-minute patrol check
-3. Opus quick-reviews: Did the change match the task description? Any errors? Only expected files modified?
-4. If clean → Opus sets status `✅ Approved (patrol fast-approve)` → CC continues
-5. If anything unexpected → Opus switches to full test mode
-6. Opus logs fast-approvals in patrol log
+### Writing good NEXT_ACTION prompts
 
-**What qualifies as ⚪ Trivial (Opus sets this — agents cannot self-assign):**
-- Adding/removing comments or print statements
-- Import reordering or unused import cleanup
-- Variable renaming (within a single file)
-- Formatting / linting fixes
-- Updating string literals (labels, error messages)
-- Adding logging statements
+**Be specific.** Not "fix the bugs" — instead "fix the regex in NameParser.swift line 51 that fails on unclosed parentheses from OCR truncation."
 
-**What is NOT ⚪ Trivial (even if it seems small):**
-- Any logic change, even one line
-- Any new file creation
-- Any API or interface change
-- Any change to a file that another agent is also modifying
+**Reference FINDINGS by number.** "Fix items 2 and 5" not "fix the issues."
+
+**State the completion signal.** Always end with "then set STATUS to X."
+
+**Include verification steps.** For Cowork: "verify the name displays as 'Sharick, Louise M' without '(Lou'." For Claude Code: "build should complete with 0 errors. Warnings OK."
+
+---
+
+## FINDINGS
+
+> **Cowork writes. Claude Code reads and fixes. Cowork verifies.**
+> Each finding has a lifecycle: `open` → `fixed` → `verified` (or back to `open`).
+
+```
+[1] severity: major | context_menu_missing_items
+    CH09 R4: Right-click context menu missing "Set Description" and
+    "Select All in Group". Only shows Assign/Exclude/Transform.
+    File: PhotoGridView.swift
+    found_by: cowork | status: open
+
+[2] severity: major | parenthetical_name_not_stripped
+    CH05: OCR truncated "(Lou" without closing paren not stripped by
+    regex in NameParser.swift:51. Regex requires closing ) but OCR
+    doesn't always provide it.
+    found_by: cowork | status: open
+
+[3] severity: minor | description_placeholder
+    ...
+    found_by: cowork | status: open
+```
+
+### Severity levels
+
+| Level | Meaning | Fix priority |
+|-------|---------|-------------|
+| `critical` | App crashes, data loss, blocks entire flow | Fix immediately, before any other work |
+| `major` | Feature broken or spec violation, but app doesn't crash | Fix in current iteration |
+| `minor` | Cosmetic, non-blocking, nice-to-have | Fix if time permits, or defer |
+
+### Finding status lifecycle
+
+```
+open ──→ fixed (Claude Code applied fix and rebuilt)
+              ──→ verified (Cowork retested and confirmed)
+              ──→ open (Cowork retested and it's still broken)
+```
+
+---
+
+## PROJECT INFO
+
+```
+PROJECT_NAME:       [e.g., PhotoSortVision]
+PROJECT_PATH:       [e.g., /Users/huan/Desktop/PhotoSortVision]
+BUILD_TOOL:         [e.g., Xcode]
+BUILD_COMMAND:      [e.g., xcodebuild -scheme PhotoSortVision -configuration Debug build]
+APP_LAUNCH:         [e.g., open /path/to/PhotoSortVision.app]
+PRD_PATH:           [e.g., CLAUDE.md + CH01-CH17 chapter specs]
+PATROL_INTERVAL:    10 minutes
+TIMEOUT_WINDOW_1:   60 minutes
+TIMEOUT_WINDOW_2:   30 minutes
+```
+
+### APP BUILD & LAUNCH
+
+**For Xcode projects:** Cowork can build via GUI (Product → Clean Build Folder → Product → Build → Product → Run). Terminal is click-tier only but Xcode menu clicks work. Claude Code can also build via `xcodebuild` command line.
+
+**APP_BUILD_METHOD:** [xcodebuild CLI | Cowork clicks Xcode GUI | npm run dev | etc.]
+**APP_LAUNCH:** [open /path/to/App.app | Cowork clicks Run in Xcode | localhost:3000]
+
+---
+
+## PATROL PROTOCOL
+
+### For Claude Code (Builder)
+
+```
+Every PATROL_INTERVAL (10 minutes):
+  1. Read CURRENT STATUS BLOCK
+  2. If STATUS is BUILD_REQUESTED or FIX_REQUESTED:
+     → Read NEXT_ACTION_FOR_CLAUDE_CODE
+     → Execute the instructions
+     → Log result to ACTIONS_TAKEN
+     → Update STATUS (typically to READY_FOR_TEST)
+     → Write NEXT_ACTION_FOR_COWORK describing what was done
+     → Update LAST_UPDATED and UPDATED_BY
+  3. If STATUS is anything else:
+     → Do nothing. Log patrol check if desired.
+  4. Check TIMEOUT: if your current task has been running longer
+     than TIMEOUT_WINDOW_1 without completion:
+     → Pause. Retry once.
+     → If retry exceeds TIMEOUT_WINDOW_2, set ESCALATE_TO_HUMAN.
+```
+
+### For Cowork (Test Pilot)
+
+```
+Every PATROL_INTERVAL (10 minutes):
+  1. Read CURRENT STATUS BLOCK
+  2. If STATUS is READY_FOR_TEST, RETEST_REQUESTED, or AWAITING_TESTER:
+     → Read NEXT_ACTION_FOR_COWORK
+     → Open the app via computer use
+     → Test according to ACTIVE_PERSONA and instructions
+     → Write results to FINDINGS
+     → Log actions to ACTIONS_TAKEN
+     → Update STATUS (FIX_REQUESTED or RETEST_PASSED)
+     → Write NEXT_ACTION_FOR_CLAUDE_CODE with specific fix instructions
+     → Update LAST_UPDATED and UPDATED_BY
+  3. If STATUS is anything else:
+     → Do nothing. Log patrol check if desired.
+  4. Check TIMEOUT: if your current task has been running longer
+     than TIMEOUT_WINDOW_1 without completion:
+     → Pause. Retry once.
+     → If retry exceeds TIMEOUT_WINDOW_2, set ESCALATE_TO_HUMAN.
+```
+
+### Patrol timing
+
+```
+PATROL_INTERVAL:    10 minutes (default, configurable)
+TIMEOUT_WINDOW_1:   60 minutes — if task not complete, pause and retry once
+TIMEOUT_WINDOW_2:   30 minutes — if retry fails, set ESCALATE_TO_HUMAN
+```
+
+Both agents should note their patrol in ACTIONS_TAKEN only when they take action (not on empty polls). This keeps the log clean.
 
 ---
 
 ## 🤖 AGENT ROLES & RULES
 
-### 🟣 Cowork — Opus (THE BRAIN + TEST PILOT)
-**The single source of authority for all project decisions. Also the primary test pilot.**
-- Wakes when `ESCALATE OPUS: YES` OR when human triggers manually
-- On wake: reads STATUS BLOCK → reads full AGENT OUTPUT LOG → reads relevant Obsidian vault notes
-- Decomposes high-level goals into task queue entries with **risk levels**
-- Reviews ALL agent output before approving next steps
-- **Writes feedback/direction/tasks into `FLIGHT_PLAN.md`** — the shared record
-- **Then switches to Terminal via computer use** and types instructions directly into the Claude Code / Second Builder session, telling the code agent to read the feedback and act on it
-- After deciding: updates task queue, writes feedback, sets `ESCALATE OPUS: NO`
-- Writes key decisions to Obsidian vault `_Orchestration/decisions-log.md`
-- Logs all direct terminal interventions in AGENT OUTPUT LOG
-- **TEST PILOT:** After approving any 🟡 Medium or 🔴 High risk task, Cowork Opus test-pilots the app through computer use — clicking, typing, and navigating (see TEST PILOT PROTOCOL below)
-- **ONLY agent that can**: restructure task queue, reassign tasks, change architecture, resolve conflicts, directly control other agent terminals, set risk levels
+### Claude Code (Builder)
 
-### 🟡 Opus Patrol Mode (10-Minute Check — ALL Agents + Fast-Approver)
-- **Checks in every 10 minutes** — reads STATUS BLOCK + scans AGENT OUTPUT LOG for changes
-- **FIRST CHECK: Is GLOBAL STOP set to 🛑 FROZEN?** If yes → log patrol, take NO actions, wait for unfreeze.
-- **Patrols ALL agents on every check-in:**
-  - **Claude Code status check:** Is CC building? Stuck? Auto-proceeding? Erroring? How many tasks completed since last check? What are the confidence scores?
-  - **Second Builder status check:** Is Second Builder waiting for plan approval? Executing? How long has it been in current state?
-  - **Cowork Opus Test Status:** Is the tester running? Any new findings? Screenshots captured?
-  - **Cowork Opus:** Is Opus awake? When did it last write feedback? Is it test-driving?
-- **Fast-approve authority (⚪ Trivial tasks only):**
-  - If a ⚪ Trivial task is `⏳ Awaiting Review` → Opus reviews it in patrol mode
-  - Opus checks: correct files modified? No logic changes? No errors? Matches task description?
-  - If clean → Opus approves directly: `✅ Approved (patrol fast-approve)`
-  - If anything unexpected → Opus switches to full test mode
-  - **Opus patrol NEVER fast-approves anything above ⚪ Trivial**
-- **Confidence monitoring:**
-  - If any agent reports confidence < 80% → Opus switches to full test mode immediately
-  - If CC auto-proceeded with confidence 80-90% for 3+ tasks → Opus flags for full review
-- **Routing actions on each check-in:**
-  - If Second Builder has a new task assigned → Opus initiates Second Builder with: **"Plan mode only. Write your plan to FLIGHT_PLAN.md under your Agent Output Log entry. Do NOT execute. Wait for Cowork Opus approval."**
-  - If Claude Code has a new task assigned → Opus passes the task with risk level and auto-proceed rules
-  - If any agent is `⏳ Awaiting Review` (non-trivial) → Opus enters full review mode
-  - If Claude Code has been `🟢 Auto-Proceeding` for 3+ tasks without Opus check → Opus flags for batch review
-  - If any agent has been in same status for >10 min → Opus investigates and logs finding
-- Grants routine permission approvals (file access, non-architectural decisions)
-- Escalates to Opus if: blocked >10 min, 3+ audit failures, architecture decision needed, agent conflict
-- Appends check-in to PATROL CHECK-IN LOG
+- Runs in Terminal
+- Reads FLIGHT_PLAN.md STATUS BLOCK on every patrol (every 10 minutes)
+- When STATUS is `BUILD_REQUESTED` or `FIX_REQUESTED`:
+  - Reads NEXT_ACTION_FOR_CLAUDE_CODE
+  - Executes the build/fix instructions
+  - Logs results to ACTIONS_TAKEN
+  - Updates STATUS to `READY_FOR_TEST` when complete
+  - Writes NEXT_ACTION_FOR_COWORK
+- When STATUS is anything else:
+  - Does nothing. Waits.
+- If stuck for >60 min (TIMEOUT_WINDOW_1):
+  - Pauses, retries once
+  - If still stuck after 30 more minutes, sets `ESCALATE_TO_HUMAN`
 
-### 🔵 Claude Code (Builder + Code Auditor — With Autopilot)
-- Default model: Sonnet. Switch to Opus for complex decisions.
-- **MUST write a plan before any action**
-- Executes assigned tasks from the task queue
+### Cowork (Test Pilot)
 
-**Autopilot mode (🟢 Low risk tasks):**
-- When a task is marked 🟢 Low AND the next task in queue is also 🟢 Low with no dependency:
-  - CC completes task → writes output to AGENT OUTPUT LOG → sets status to `🟢 Auto-Proceeding`
-  - CC **immediately starts the next 🟢 Low task** without waiting for Opus
-  - CC still logs every task completion — Opus can review in batches
-  - If CC encounters ANY error, unexpected result, or uncertainty → **immediately stops, sets ⏳ Awaiting Review**
-  - **If CC's confidence score drops below 80% → immediately stops, sets ⏳ Awaiting Review**
-  - Opus patrol checks on CC every 10 minutes and flags for Opus batch review after 3+ auto-proceeded tasks
-
-**Trivial mode (⚪ Trivial tasks):**
-- CC completes task → writes output → sets `⏳ Awaiting Review`
-- **Opus fast-approves on next patrol check** — Opus is NOT woken
-- CC may auto-proceed to next ⚪ task if Opus has already fast-approved the pattern
-
-**Standard mode (🟡 Medium / 🔴 High risk tasks):**
-- CC completes task → writes output to AGENT OUTPUT LOG → sets status to `⏳ Awaiting Review` → **STOPS**
-- **DOES NOT start next task until Cowork Opus writes feedback/approval in FEEDBACK QUEUE**
-
-- Checks FEEDBACK QUEUE for direction before every new action
-- Flags blockers immediately in STATUS BLOCK
-
-### 🟢 Second Builder (Builder — Plan First, Always)
-- **ALWAYS enters in plan-only mode when initiated by Opus patrol**
-- Writes detailed plan to AGENT OUTPUT LOG → sets status to `📋 Planning` → **STOPS**
-- **DOES NOT execute until Cowork Opus explicitly approves the plan**
-- After plan approval: executes → writes output → sets status to `⏳ Awaiting Review` → **STOPS**
-- **Second Builder NEVER auto-proceeds.** Every task requires full plan → approve → execute → review cycle.
-- Append only — never overwrite other agent entries
-- Checks FEEDBACK QUEUE for direction before every new action
-
-### 🟠 Opus Test Mode (Live App Testing — Triggered by Patrol)
-- Uses computer use to interact with the running app
-- Tests all features against PRD expected outcomes
-- Captures screenshots as evidence → saves to `AUDIT_SCREENSHOTS/`
-- Reports UX feedback: Smooth ✅ · Clunky ⚠️ · Broken ❌
-- **Runs continuously during build phases** — tests each feature as soon as it's built, not just at completion
-- Writes findings to AUDIT LOG → sets relevant task to `⏳ Awaiting Review` if issues found
-- Triggered by patrol mode when "Ready for test" appears — reports status on each check-in
+- Runs in Cowork desktop
+- Reads FLIGHT_PLAN.md STATUS BLOCK on every patrol (every 10 minutes)
+- When STATUS is `READY_FOR_TEST`, `RETEST_REQUESTED`, or `AWAITING_TESTER`:
+  - Reads NEXT_ACTION_FOR_COWORK
+  - Opens the app via computer use
+  - Tests according to the ACTIVE_PERSONA
+  - Writes bugs to FINDINGS with severity levels
+  - Logs results to ACTIONS_TAKEN
+  - Updates STATUS to either `FIX_REQUESTED` (bugs found) or `RETEST_PASSED` (all pass)
+  - Writes NEXT_ACTION_FOR_CLAUDE_CODE with specific fix instructions
+- When STATUS is anything else:
+  - Does nothing. Waits.
+- If stuck for >60 min (TIMEOUT_WINDOW_1):
+  - Pauses, retries once
+  - If still stuck after 30 more minutes, sets `ESCALATE_TO_HUMAN`
 
 ---
 
-## 🧪 TEST PILOT PROTOCOL — COWORK OPUS AS REAL HUMAN TESTER
-> After every completed step (🟡 Medium or 🔴 High), Cowork Opus becomes the test pilot.
-> This is NOT automated testing. This is Opus using the app like a real person would.
+## TEST PERSONAS
 
-### What "Test Driving" Means
-Cowork Opus uses computer use to:
-1. **Launch the app** — open Xcode simulator, run the build, or open the project in its target environment
-2. **Interact through computer use** — tap buttons, scroll, navigate between screens, enter data, try the feature that was just built
-3. **Try edge cases** — what happens with empty input? With very long text? With rapid tapping? Rotating the device?
-4. **Follow the user journey** — don't just test the new feature in isolation. Walk through the full flow a real user would take: open app → create project → use the feature → review results
-5. **Look at it visually** — is the UI aligned? Do colors look right? Does the layout break on different content?
-6. **Try to break it** — a real QA human tries to find bugs, not confirm the happy path
+> **Cowork works through personas one at a time. Each persona is a full test pass.**
 
-### Test Pilot Workflow
 ```
-1.  Agent completes 🟡/🔴 task → sets ⏳ Awaiting Review
-2.  Opus reviews code/output in AGENT OUTPUT LOG
-3.  Opus sets task status → 🧪 Test-Piloting
-4.  Opus launches the app via computer use
-5.  Opus interacts with the app through computer use:
-    ┌──────────────────────────────────────────────┐
-    │  • Open the app / navigate to the feature    │
-    │  • Try the happy path (expected use)          │
-    │  • Try edge cases (empty, long, rapid, wrong) │
-    │  • Check visual alignment and layout          │
-    │  • Test the full user journey, not just the   │
-    │    isolated feature                           │
-    │  • Take screenshots of anything notable       │
-    └──────────────────────────────────────────────┘
-6.  Opus writes TEST PILOT REPORT (see below)
-7.  If PASS → sets status ✅ Approved → writes feedback → next task
-8.  If FAIL → sets status 🔁 Revision Needed → writes specific bugs found → agent fixes
+ACTIVE_PERSONA:      [e.g., Cold User (Tier 1)]
+PERSONA_SPEC:        [e.g., "Knows nothing about the app. No manual, no PRD."]
+PERSONAS_COMPLETED:  [e.g., Cold User ✅, Guided User ✅]
+PERSONAS_REMAINING:  [e.g., Insider (Tier 3)]
 ```
 
-### Test Pilot Report Template
-```
-[YYYY-MM-DD HH:MM] — Opus Test Pilot Report
-Task ID: T001
-Feature Tested: [what was built]
-App State: [how was the app launched — simulator, build, remote desktop]
+### Persona progression
 
-Happy Path:
-  • [step tried] → [result] ✅/❌
-  • [step tried] → [result] ✅/❌
-
-Edge Cases:
-  • Empty input → [result] ✅/❌
-  • Long text → [result] ✅/❌
-  • Rapid interaction → [result] ✅/❌
-  • [other edge case] → [result] ✅/❌
-
-Visual Check:
-  • Layout: [aligned / broken / minor issues]
-  • Colors/fonts: [correct / off]
-  • Responsive to content: [yes / no]
-
-User Journey Test:
-  • Full flow from [start] to [end]: [completed / broke at step X]
-
-Screenshots: [paths to saved screenshots]
-
-Verdict: ✅ PASS — Ready for next task / ❌ FAIL — Needs revision
-Bugs Found:
-  • [specific bug 1 — what happened, where, steps to reproduce]
-  • [specific bug 2]
-Feedback to Agent:
-  [specific direction for fixes]
-```
-
-### When to Test Pilot vs. Batch Review
-- 🔴 High risk → **Always test pilot immediately**
-- 🟡 Medium risk → **Test pilot after each task**
-- 🟢 Low risk (auto-proceed) → **Opus batch-reviews code only.** Opus handles app testing for low-risk items in patrol mode. Opus test-pilots a sample of 🟢 tasks every ~3 batch reviews.
+When a persona's test pass is complete (all findings verified or no findings):
+1. Move current persona to PERSONAS_COMPLETED
+2. Set next persona as ACTIVE_PERSONA
+3. If app changes were needed, set `STATUS: BUILD_REQUESTED` (Claude Code rebuilds before next persona)
+4. If no changes needed, set `STATUS: READY_FOR_TEST` (Cowork continues with next persona)
+5. When PERSONAS_REMAINING is empty, set `STATUS: LOOP_COMPLETE`
 
 ---
 
-## 📬 FEEDBACK QUEUE
-> **Cowork Opus writes here. Agents read before every action.**
-> This is the primary direction channel — agents must check this before starting or resuming work.
+## ACTIONS TAKEN
+
+> **Append-only log. Both agents write. Never delete entries.**
 
 ```
-[YYYY-MM-DD HH:MM] — Opus → Claude Code
-Re: T001
-Decision: APPROVED / REVISION NEEDED / HOLD
+[2026-03-27 20:15] claude_code — Built successfully (21 warnings, 0 errors). App launched.
+[2026-03-27 20:18] cowork — Tested Grandma Rose persona on Import and Review screens. 2 bugs found (items 1-2). Set FIX_REQUESTED.
+[2026-03-27 20:25] claude_code — Fixed item 1 (PhotoGridView.swift +32 lines) and item 2 (NameParser.swift regex). Rebuilt. App relaunched. Set READY_FOR_TEST.
+[2026-03-27 20:28] cowork — Retested items 1-2. Both verified. Set RETEST_PASSED.
+```
+
+---
+
+## ESCALATION RULES
+
+### Automatic escalation (either agent)
+
+- Task exceeds TIMEOUT_WINDOW_1 + TIMEOUT_WINDOW_2 → `ESCALATE_TO_HUMAN`
+- Build fails 3 consecutive times → `ESCALATE_TO_HUMAN`
+- Same finding fails verification 3 times → `ESCALATE_TO_HUMAN`
+
+### Claude Code escalation
+
+- Unclear how to fix a finding → write question in ACTIONS_TAKEN, set `ESCALATE_TO_HUMAN`
+- Architectural decision needed (not in PRD) → set `ESCALATE_TO_HUMAN`
+- Fix requires changes to files outside project scope → set `ESCALATE_TO_HUMAN`
+
+### Cowork escalation
+
+- App won't launch or is unresponsive → set `ESCALATE_TO_HUMAN`
+- Finding is ambiguous (might be intended behavior) → write question, set `ESCALATE_TO_HUMAN`
+- Computer use can't access required UI element → log limitation, set `ESCALATE_TO_HUMAN`
+
+### Human resolution
+
+When human sees `ESCALATE_TO_HUMAN`:
+1. Read ACTIONS_TAKEN for context
+2. Make the decision or fix the blocker
+3. Update NEXT_ACTION for the appropriate agent
+4. Set STATUS back to the appropriate active state
+5. Agents pick up on next patrol
 Test Pilot Result: ✅ PASS / ❌ FAIL / ⏭️ SKIPPED (Low risk)
 Comments:
   [specific feedback, direction, or architectural guidance]
@@ -810,12 +673,12 @@ Opus patrols every 10 minutes even during overnight runs. Kill switch still work
 6.  Write feedback/direction into FLIGHT_PLAN.md
     • Update FEEDBACK QUEUE with direction for each agent
     • Update TASK QUEUE if needed (add/modify/reassign)
-7.  Switch to Terminal (Cmd+Tab) → type into Claude Code session:
-    • "Read FLIGHT_PLAN.md — test pilot feedback for T001. Fix the
-       issues, rebuild, relaunch, and update file when ready for retest."
-    • This directly tells the code agent to act on the feedback
-    • No waiting for the agent to discover the file change on its own
-8.  Write decisions to Obsidian vault (decisions-log.md)
+7.  Update NEXT_ACTION_FOR_CLAUDE_CODE with specific fix instructions:
+    • "Read FINDINGS items 1-3 in FLIGHT_PLAN.md. Fix the issues,
+       rebuild, relaunch, and set STATUS to READY_FOR_TEST."
+    • Set STATUS to FIX_REQUESTED
+    • Claude Code picks this up on its next 10-minute patrol
+8.  Write decisions to Obsidian vault if configured (decisions-log.md)
 9.  Return to patrol mode (10-minute checks)
 ```
 
@@ -1034,8 +897,8 @@ Next expected wake: [when and why]
 | Second Builder plan ready for review              | Opus enters full review mode      |
 | CC auto-proceeded 3+ tasks               | Opus flags for batch review    |
 | Human director triggers Cowork manually            | Cowork Opus wakes immediately        |
-| Agent not responding to .md feedback     | Opus uses FALLBACK terminal control  |
-| Agent stuck in loop / wrong direction    | Opus uses FALLBACK terminal control  |
+| Agent not responding after 2 patrol intervals | Set STATUS to ESCALATE_TO_HUMAN     |
+| Agent stuck in loop / wrong direction    | Set STATUS to ESCALATE_TO_HUMAN     |
 | Test pilot reveals critical bug          | Opus marks 🔴 and assigns immediate fix |
 | System going in wrong direction          | Any agent or the human director sets `GLOBAL STOP: 🛑 FROZEN` |
 
@@ -1053,121 +916,88 @@ Next expected wake: [when and why]
 6. Only Cowork Opus writes to the FEEDBACK QUEUE
 7. Agents must read FEEDBACK QUEUE before starting any new work
 
-### Direct Terminal Control (Fallback)
-> Only Cowork Opus may use this channel. All other agents communicate exclusively via the .md file.
+### No Direct Terminal Control
+> Cowork cannot type into Terminal (click-tier safety boundary). All communication between agents happens exclusively through this file.
 
-8. Cowork Opus may switch to an agent's terminal via computer use when:
-   - Agent has not responded to .md feedback within ~2 minutes
-   - Agent is stuck in a loop or producing incorrect output
-   - Urgent mid-execution redirect is needed ("STOP — wrong approach")
-   - Complex context (error logs, stack traces) needs to be pasted directly
-9. When using terminal fallback, Cowork types clearly prefixed instructions:
+8. If an agent has not responded to STATUS changes within 2 patrol intervals (~20 minutes):
+   - The other agent writes to ACTIONS_TAKEN: "[agent] appears unresponsive. Last update: [timestamp]."
+   - Set STATUS to ESCALATE_TO_HUMAN
+   - Human director restarts the stuck agent, which reads this file to resume
+9. There is no fallback channel. FLIGHT_PLAN.md is the only communication mechanism.
+10. If context is too complex for the NEXT_ACTION field (e.g., long error logs), write it to a separate file in the project and reference the path in NEXT_ACTION.
+
+---
+
+## CRASH RECOVERY
+
+### Claude Code crashes or disconnects
+
+Cowork will see stale LAST_UPDATED (no update within expected timeframe).
+After 2 missed patrol intervals with no status change:
+1. Cowork writes to ACTIONS_TAKEN: "Claude Code appears unresponsive. Last update: [timestamp]."
+2. Cowork sets `ESCALATE_TO_HUMAN`
+3. Human restarts Claude Code. Claude Code reads STATUS BLOCK, picks up where it left off.
+
+### Cowork crashes or disconnects
+
+Claude Code will see stale LAST_UPDATED after setting READY_FOR_TEST.
+After 2 missed patrol intervals with no pickup:
+1. Claude Code writes to ACTIONS_TAKEN: "Cowork has not picked up READY_FOR_TEST. Last update: [timestamp]."
+2. Claude Code sets `ESCALATE_TO_HUMAN`
+3. Human restarts Cowork. Cowork reads STATUS BLOCK, picks up where it left off.
+
+### Both crash
+
+Human notices both agents idle. Reads FLIGHT_PLAN.md for last known state. Restarts both. They resume from STATUS BLOCK.
+
+---
+
+## SETUP INSTRUCTIONS
+
+### First time — human does this once
+
+1. Copy this template into your project at `FLIGHT_DECK/FLIGHT_PLAN.md`
+2. Fill in PROJECT INFO (name, path, build command, etc.)
+3. Fill in TEST PERSONAS (which personas/tiers to run)
+4. Set initial status:
    ```
-   [OPUS DIRECT] Read FLIGHT_PLAN.md now — new feedback for T001
-   [OPUS DIRECT] STOP current work. Architectural change required. See FEEDBACK QUEUE.
-   [OPUS DIRECT] Context for your current task: [paste relevant info]
+   CURRENT_PHASE:  build
+   ASSIGNED_TO:    claude_code
+   STATUS:         BUILD_REQUESTED
+   LAST_UPDATED:   [now]
+   UPDATED_BY:     human
+   ITERATION:      1
    ```
-10. Every terminal intervention MUST be logged in the AGENT OUTPUT LOG with:
-    - Timestamp, target agent, reason for fallback, action taken, result
-11. After terminal intervention, resume using the .md file as primary channel
+5. Write initial NEXT_ACTION:
+   ```
+   NEXT_ACTION_FOR_CLAUDE_CODE:
+     "Build the app using [build command]. Launch it. Set STATUS
+      to READY_FOR_TEST when the app is running."
+
+   NEXT_ACTION_FOR_COWORK:
+     "Wait for Claude Code to build. On next patrol, if STATUS is
+      READY_FOR_TEST, begin testing with [first persona]."
+   ```
+6. Start Claude Code in Terminal with the project folder. Tell it:
+   *"You are the Builder agent in the Test Pilot Loop. Read FLIGHT_DECK/FLIGHT_PLAN.md and follow the PATROL PROTOCOL for Claude Code. Check the file every 10 minutes."*
+7. Start Cowork with the project folder mounted. Tell it:
+   *"You are the Test Pilot in the Test Pilot Loop. Read FLIGHT_DECK/FLIGHT_PLAN.md and follow the PATROL PROTOCOL for Cowork. Check the file every 10 minutes."*
+8. Both agents now run independently. Monitor ACTIONS_TAKEN for progress.
 
 ---
 
-## 🔄 CRASH RECOVERY PROTOCOL
-> What to do when a session dies, an agent crashes, or context is lost.
+## CRITICAL RULES
 
-### If Cowork Opus session crashes:
-1. Human director manually restarts Cowork Opus
-2. Opus reads Obsidian vault `_Orchestration/decisions-log.md` + project `session-handoffs.md` to restore context
-3. Opus reads FLIGHT_PLAN.md STATUS BLOCK + AGENT OUTPUT LOG to see current state
-4. Opus resumes from last known state — re-reviews any `⏳ Awaiting Review` items
-5. Opus writes: `[YYYY-MM-DD HH:MM] — Opus RECOVERED from session crash. Context restored from Obsidian vault.`
-
-### If Claude Code session crashes:
-1. Opus detects on next 10-minute patrol (status unchanged, no output for >10 min)
-2. Opus enters full review mode with note: "Claude Code appears crashed"
-3. Opus restarts Claude Code via terminal (fallback channel) or notifies the human director
-4. New CC session reads CLAUDE.md (which imports AUTOPILOT.md) + FLIGHT_PLAN.md to restore context
-5. CC resumes from last logged task — any in-progress work is re-executed from the plan
-
-### If Second Builder session crashes:
-1. Opus detects on next 10-minute patrol
-2. Opus re-initiates Second Builder in plan-only mode for the current task
-3. If Second Builder had an approved plan, Opus passes: "Your plan was already approved. Resume execution from step [X]."
-4. If Second Builder was still planning, Opus passes: "Restart your plan for task T00X."
-
-### If Opus patrol stops (session timeout or crash):
-1. Cowork Opus notices no patrol entries for >10 minutes
-2. Human director notices patrol has stopped (no recent patrol entries).
-3. Human director restarts Cowork with Opus and re-gives patrol instruction.
-4. Opus resumes patrol from where it left off.
-
-### Recovery state file:
-After any crash recovery, Opus writes to Obsidian vault `_Orchestration/lessons-learned.md`:
-```
-[YYYY-MM-DD HH:MM] — Crash Recovery
-What crashed: [agent name]
-What was lost: [any work that couldn't be recovered]
-How recovered: [steps taken]
-Prevention: [what to do differently next time]
-```
+1. **STATUS BLOCK is the single source of truth.** Both agents read it before every action.
+2. **NEXT_ACTION is mandatory.** Every STATUS update must include plain-language instructions for the other agent.
+3. **FINDINGS is append-only for new items.** Status field (open/fixed/verified) is updated in place.
+4. **ACTIONS_TAKEN is append-only always.** Never delete log entries.
+5. **One agent acts at a time.** STATUS determines who. The other waits.
+6. **Never inflate progress.** If a fix didn't work, set it back to `open`. If a build failed, say so.
+7. **Escalate early.** Stuck for more than one patrol cycle? Set `ESCALATE_TO_HUMAN`. Don't spin.
+8. **This file is the only communication channel.** No Terminal commands between agents. No direct interaction. If it's not in this file, it didn't happen.
 
 ---
 
-## 📁 FILE REFERENCES
-
-| File                         | Purpose                                               |
-|------------------------------|-------------------------------------------------------|
-| `PRD.md`                     | Product requirements — single source of truth          |
-| `FLIGHT_PLAN.md`     | This file — shared communication hub                   |
-| `CLAUDE.md` + `FLIGHT_DECK/AUTOPILOT.md` | Claude Code project-level instructions  |
-| `AUDIT_SCREENSHOTS/`         | Folder for Cowork test screenshots + test pilot screenshots |
-| `YourProject-SecondBrain/`   | Obsidian vault — persistent memory across sessions     |
-
-### 🔮 FILE-SPLIT ROADMAP (When Contention Gets Real)
-> **Don't split now.** Run v0.1.0 as a single file first. Split ONLY when you see actual write collisions.
-
-When the single `FLIGHT_PLAN.md` file starts causing problems (two agents writing simultaneously, corrupted entries, logs getting too long to read), split into:
-
-| File | What moves there | Who writes | Who reads |
-|------|-------------------|------------|-----------|
-| `TASK_QUEUE.md` | Task queue table only | Opus only | Everyone |
-| `FEEDBACK.md` | Feedback queue entries | Opus only | CC, Second Builder |
-| `AGENT_LOG.md` | Agent output log entries | CC, Second Builder, Testers | Opus |
-| `STATUS.md` | Status block + kill switch | Opus (status), Anyone (kill switch) | Everyone |
-| `PATROL_LOG.md` | Opus patrol entries | Opus only | Human director |
-| `AUDIT_LOG.md` | Audit + test pilot reports | Opus, Testers | Opus, CC |
-
-**Split trigger:** If you see `[AGENT NAME — WRITING]` collisions in logs more than twice in one session, it's time. Until then, one file is simpler.
-
----
-
-## 🔑 CRITICAL RULES — ALL AGENTS READ THIS
-
-0. **CHECK GLOBAL STOP FIRST.** Before every action, check `GLOBAL STOP`. If `🛑 FROZEN` → do nothing. Log your state and wait.
-1. **CHECK PILOT MODE.** Determines whether to escalate to the human director or let Opus decide autonomously.
-   - 👨‍✈️ SUPERVISED = Escalate to the human director per the escalation matrix
-   - ✈️ AUTOPILOT = Opus decides everything. Human director reviews when they return.
-   - 🛬 AUTOPILOT-SAFE = Only 🟢/⚪ tasks proceed. Everything else holds.
-2. **Cowork Opus is the ONLY decision-maker.** No agent makes architectural, design, or strategic decisions independently. In autopilot, Opus assumes the human director's authority within guardrails.
-3. **Risk level determines workflow:**
-   - ⚪ Trivial = Opus fast-approves during patrol, no full test needed
-   - 🟢 Low = CC can auto-proceed, Opus batch-reviews
-   - 🟡 Medium / 🔴 High = full stop + Opus review + test pilot
-4. **Second Builder NEVER auto-proceeds.** Always: plan → stop → approval → execute → stop → review.
-5. **Claude Code checks risk level before deciding to auto-proceed or stop.** When in doubt, stop.
-6. **Report confidence scores honestly.** If below 80%, stop and escalate. Don't auto-proceed with low confidence.
-7. **Check FEEDBACK QUEUE before every action.** If Opus has written feedback for you, follow it before doing anything else.
-8. **Never start a task not in the Task Queue.** If you think a task is needed, flag it in your output and let Opus decide.
-9. **Append only.** Never delete or overwrite another agent's entries in any log section.
-10. **When in doubt, escalate.** Set `ESCALATE OPUS: YES` rather than making an uncertain decision.
-11. **Opus patrols every 10 minutes.** ALL agents are monitored. No agent operates unwatched — even in autopilot.
-12. **Opus test-pilots after every 🟡/🔴 task.** The app must be usable through computer use before a task is approved.
-13. **Anyone can pull the kill switch.** If the system is going wrong, set `GLOBAL STOP: 🛑 FROZEN`. This overrides ALL modes including autopilot.
-14. **Autopilot is not unsupervised.** Opus still applies full governance. Autopilot means Opus makes the calls the human director would make — not that governance is relaxed. Every autopilot decision is logged with reasoning and confidence for the human director to review later.
-
----
-
-*Flight Plan v0.1.0 — Test Pilot Loop Framework by Huan Su*
-*Ralph Wiggum Loop (Build) + Test Pilot Loop (Validate) = Ship with confidence*
-*Cowork Opus = Brain + Patrol + Test Pilot · Ralph = Build Engine · Shared File = Communication*
+*Flight Plan — Dual-Patrol Model v0.2.0*
+*Test Pilot Loop by Huan Su · 2026*

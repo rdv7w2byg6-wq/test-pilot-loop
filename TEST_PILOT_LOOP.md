@@ -158,10 +158,7 @@ TEST MODE (triggered by "Ready for test"):
   2. Find the app on screen (window title, URL, or Simulator)
   3. Run three knowledge-level tests (Cold, Guided, Insider)
   4. Write your structured feedback to FLIGHT_PLAN.md
-  5. Switch to Terminal (Cmd+Tab) and type into the Claude Code session:
-     "Read FLIGHT_PLAN.md for test pilot feedback. Fix the issues,
-      rebuild, relaunch the app, and update the file when ready
-      for retest."
+  5. Update FLIGHT_PLAN.md with specific instructions in NEXT_ACTION_FOR_CLAUDE_CODE. Claude Code picks this up on its next patrol cycle (every 10 minutes).
   6. Return to PATROL MODE
 
 Keep cycling between patrol and test until I tell you to stop.
@@ -194,48 +191,57 @@ Ready for test pilot.
 
 Opus picks this up on the next patrol check.
 
-### The Automated Loop
+### How Cowork Launches the App for Testing
 
-After testing, Opus doesn't just write to the shared file — it **switches to Terminal and tells Claude Code directly** using computer use. Opus can Cmd+Tab to the Terminal window and type instructions into Claude Code's session, just like a human supervisor walking over to the developer's desk.
+For Xcode projects, Cowork Opus can build and launch the app directly by clicking menu items (click-tier access is sufficient for Xcode menus). The typical flow:
+
+1. Claude Code builds the feature and writes "Ready for test" to FLIGHT_PLAN.md
+2. Opus sees this and finds the Xcode window on screen
+3. **For macOS apps:** Opus clicks Product → Build, then Product → Run to launch the app
+4. Alternatively, Claude Code can build via `xcodebuild` command line and place the `.app` in a known location (e.g., `~/Downloads/`). Opus then launches it with `open -a "AppName"` or by clicking the `.app` in Finder
+5. Once the app is running, Opus can test it directly
+
+This avoids any Terminal typing. The build happens either through Xcode menu clicks or through Claude Code's earlier command line invocation.
+
+### The Dual-Patrol Model
+
+Both agents patrol `FLIGHT_PLAN.md` independently every 10 minutes. Neither agent needs to interact with the other directly — they communicate purely through the shared file using STATUS codes and NEXT_ACTION instructions.
 
 ```
 Session Start: User opens Cowork (Opus) + Claude Code
                        ↓
 ┌──────────────────────────────────────────────────────┐
 │                                                       │
-│  Claude Code                    Cowork Opus           │
-│  ────────────                   ───────────           │
-│  Builds feature                 PATROL MODE           │
-│  Runs tests                     (checks file          │
-│  Launches app                    every 10 min)        │
-│  Writes "Ready" ────────────→  Sees "Ready for test"  │
+│  Claude Code              Cowork Opus                 │
+│  ────────────             ───────────                 │
+│  Builds feature           PATROL MODE                 │
+│  Runs tests               (checks FLIGHT_PLAN.md      │
+│  Launches app             every 10 min)               │
+│  Writes "Ready" ──────→ FLIGHT_PLAN.md ←── polls     │
+│                       (status: READY_FOR_TEST)        │
 │                                                       │
-│                                 Switches to TEST MODE │
-│                                 Finds app on screen   │
-│                                 Tests 3 knowledge     │
-│                                 levels                │
-│                                 Writes feedback to    │
-│                                 FLIGHT_PLAN.md        │
+│                       Switches to TEST MODE           │
+│                       Finds app on screen             │
+│                       Tests 3 knowledge levels        │
+│                       Writes feedback +               │
+│                       NEXT_ACTION to file             │
 │                                                       │
-│                                 Cmd+Tab to Terminal   │
-│                                 Types into Claude Code│
-│  ◄─── "Read FLIGHT_PLAN.md.    session:              │
-│        Fix issues 1-3.         "Fix the 3 issues,    │
-│        Rebuild and relaunch.    rebuild, relaunch,    │
-│        Update file when ready." update file."         │
+│                       ↓ (both agents poll)            │
+│  Polls FLIGHT_PLAN.md ◄─ Claude Code picks up        │
+│  Reads NEXT_ACTION        NEXT_ACTION on next          │
+│  (every 10 min)           patrol (every 10 min)        │
 │                                                       │
-│                                 Returns to PATROL     │
 │  Fixes issues                                         │
 │  Rebuilds + relaunches                                │
-│  Writes "Ready for retest" ──→ Sees "Ready for retest"│
-│                                 TEST MODE again       │
-│                                 ...                   │
+│  Writes "Ready for retest" ──→ Opus polls             │
+│                                  Sees status change    │
+│                                  TEST MODE again       │
 │                                                       │
 │  LOOP until Opus writes PASS                          │
 └──────────────────────────────────────────────────────┘
 ```
 
-**This is the key automation:** Cowork Opus has computer use. After testing the app, it can switch to the Terminal window and type directly into Claude Code's session. No user needed to relay the message.
+**The Dual-Patrol architecture:** Both agents independently patrol the shared file. Cowork cannot type into Terminal (click-tier safety boundary). The Dual-Patrol architecture routes around this entirely — neither agent needs to interact with the other directly. Communication is purely through STATUS codes and plain-language instructions in `NEXT_ACTION_FOR_CLAUDE_CODE`.
 
 ### The Cycle
 
@@ -243,8 +249,8 @@ Session Start: User opens Cowork (Opus) + Claude Code
 1. Build the feature
 2. **Launch the app** (terminal command)
 3. Write to `FLIGHT_PLAN.md`: "App running at [location]. Ready for test."
-4. Wait for instructions (from Opus via Terminal or from reading the shared file)
-5. When Opus tells it to fix issues → read `FLIGHT_PLAN.md` for details
+4. Wait for instructions by polling `FLIGHT_PLAN.md` (reads on own patrol cycle every 10 minutes)
+5. When Opus writes feedback and NEXT_ACTION → read `FLIGHT_PLAN.md` for details
 6. Fix issues, rebuild, relaunch app
 7. Write: "Fixed. App relaunched. Ready for retest."
 8. Repeat until Opus says PASS
@@ -255,8 +261,8 @@ Session Start: User opens Cowork (Opus) + Claude Code
 3. **Find the app on screen** (window title, URL, or Simulator)
 4. Run three knowledge-level tests
 5. Write structured feedback to `FLIGHT_PLAN.md`
-6. **Cmd+Tab to Terminal → type instructions to Claude Code:**
-   *"Read FLIGHT_PLAN.md for test pilot feedback. Fix the issues, rebuild, relaunch, and update the file when ready for retest."*
+6. **Write instructions to FLIGHT_PLAN.md → Claude Code reads on next patrol:**
+   Update `NEXT_ACTION_FOR_CLAUDE_CODE` with plain-language instructions like: *"Read FLIGHT_PLAN.md for test pilot feedback. Fix the issues 1-3, rebuild, relaunch, and update the file when ready for retest."*
 7. Return to patrol mode
 8. When "Ready for retest" appears → test again
 9. Approve when all three levels pass
