@@ -107,10 +107,6 @@ OpenClaw integration available — drop `OPENCLAW_SKILL.md` into any OpenClaw ag
 |------|-----------|
 | [OPENCLAW_SKILL.md](OPENCLAW_SKILL.md) | OpenClaw skill — self-contained version for OpenClaw agent systems |
 
-### 📂 Worked Example
-
-See `examples/PhotoSortVision/` for a complete worked example showing every framework artifact filled in with real test data — task queue, build output, test flight debrief, bug reports, and feedback cycle. Start with the [example README](examples/PhotoSortVision/README.md).
-
 ---
 
 ## What to Copy
@@ -229,17 +225,6 @@ test-pilot-loop/
 │   └── archetypes/
 │       └── archetype-overlays.md          ← Creator / Admin / Consumer
 ├── OPENCLAW_SKILL.md                      ← OpenClaw skill version
-├── examples/
-│   └── PhotoSortVision/                   ← Worked example (real test data)
-│       ├── README.md
-│       ├── PRD.md
-│       ├── CLAUDE.md
-│       ├── FLIGHT_DECK/
-│       │   ├── FLIGHT_PLAN.md             ← Populated: tasks, output, feedback
-│       │   ├── TEST_FLIGHT_REPORT.md      ← Full debrief with dimension scores
-│       │   └── PREFLIGHT_CHECK.md
-│       └── PERSONAS/
-│           └── jordan.md
 ├── CITATION.cff                           ← Citation metadata
 └── LICENSE                                ← MIT
 ```
