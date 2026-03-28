@@ -124,5 +124,119 @@ VERDICT: ⚠️ NEEDS WORK
 
 ---
 
-*Test Flight conducted by Cowork Opus as Cold User. PhotoSortVision v1.0, macOS.*
+---
+
+# Insider Tier — Test Flight Report
+
+```
+TEST FLIGHT REPORT (INSIDER)
+════════════════════════════
+App: PhotoSortVision (macOS, SwiftUI)
+Tester: Insider (has PRD and full product knowledge)
+Task: Verify all PRD features, test edge cases, evaluate spec compliance
+Completed: YES
+Date: 2026-03-27
+
+SCREENS VISITED: 6 (Import → Review → Sort Complete → Undo → Import → Settings)
+TOTAL ACTIONS: 7
+FOCUS: Feature completeness, data integrity, edge cases
+
+TOP FINDINGS (priority order):
+
+  1. BUG-I001 [S3 🟡 Major] — Duplicate patient entries from OCR variants
+     Steps: Review screen → Right-click photo → "Assign to" submenu
+     Expected: Each patient appears once
+     Actual: "W-ng, Suet" appears twice, plus "W Ng, Suet" as third entry.
+       "Tien, An Vinh" also appears twice.
+     Root Cause: Missing validation — OCR name deduplication not handling
+       variant spellings (hyphen/space, spacing differences)
+     PRD Impact: Sorting accuracy compromised — photos for same patient
+       could end up in different folders
+
+  2. BUG-I002 [S3 🟡 Major] — "Schedule Import" button on main screen is dead
+     Steps: Import screen → Click "Schedule Import" section
+     Expected: Opens file picker or navigates to Settings > Schedule
+     Actual: Nothing happens. Feature only accessible through Settings gear > Schedule tab.
+     Root Cause: Event handler — button not wired to action
+     PRD Impact: Core feature not discoverable from primary screen
+
+  3. BUG-I003 [S4 🔵 Minor] — No undo time remaining indicator
+     Steps: Sort photos → View completion screen → See "Undo Sort" link
+     Expected: Indicator showing "Undo available for 28 more minutes" or similar
+     Actual: No countdown or expiry information visible
+     Root Cause: Missing feature — undo expiry timer not surfaced to UI
+     PRD Impact: PRD specifies 30-minute undo window but user can't see remaining time
+
+  4. BUG-I004 [S4 🔵 Minor] — No confirmation after successful undo
+     Steps: Sort Complete → Click "Undo Sort" → Confirm → Screen changes
+     Expected: Toast or banner: "Sort undone. 455 files removed from output."
+     Actual: Screen silently transitions to Review. No confirmation message.
+     Root Cause: Missing feedback
+
+  5. BUG-I005 [S5 ⚪ Cosmetic] — "Assign to" submenu has no search
+     Steps: Right-click photo → "Assign to" → scroll through 38+ patients
+     Expected: Search/filter field at top of patient list
+     Actual: Must scroll through full list to find target patient
+     Root Cause: Missing feature — search not implemented in submenu
+
+UX RECOMMENDATIONS (Insider-specific):
+  • Deduplicate patient names using fuzzy matching (Levenshtein distance ≤ 2)
+  • Wire "Schedule Import" main-screen button to open Settings > Schedule or
+    trigger file picker directly
+  • Add undo countdown timer to completion screen
+  • Add success toast after undo completes
+```
+
+## Insider Dimension Scores
+
+| Dimension | Score | Notes |
+|-----------|-------|-------|
+| Usability & Clarity | 4/5 | Settings well-organized, but Schedule Import dead button |
+| Functional Correctness | 3/5 | Duplicate patients from OCR, dead Schedule Import button |
+| Navigation & Flow | 5/5 | Step indicator, back navigation, undo all work correctly |
+| Visual Design | 4/5 | Consistent dark theme, good layout |
+| Error Handling | 4/5 | Undo works with confirmation dialog. No expiry indicator. |
+| Data Integrity | 3/5 | Duplicate patient entries risk mis-sorting. Undo works. |
+
+**Total: 23/30 (77%) — NEEDS WORK**
+
+---
+
+# Tier Gap Analysis
+
+```
+TIER GAP RATIO
+══════════════
+Cold User actions to complete primary task:  9
+Insider actions to complete primary task:    7
+Tier Gap Ratio: 9 ÷ 7 = 1.29
+
+Interpretation: Minimal gap — the app is nearly as usable for a new user
+as for someone who knows the spec. The step indicator and green CTA buttons
+guide the workflow effectively.
+
+WHAT COLD FOUND THAT INSIDER MISSED:
+  • First-impression visual clutter (PSV Engine settings)
+  • Ambiguous labels ("Pre-filtered", "92 To Review", "NC" badge)
+  • Hidden right-click affordance
+
+WHAT INSIDER FOUND THAT COLD MISSED:
+  • Duplicate patient entries from OCR variants (needs domain knowledge)
+  • Schedule Import dead button (needs to know feature should exist)
+  • Undo timer not visible (needs to know 30-min spec)
+  • Settings > Schedule is the real Schedule Import (Cold never found it)
+
+COMBINED FINDINGS: 4 bugs (Cold) + 5 bugs (Insider) = 9 total
+  After dedup (Sort Confirmed double-click found by both): 8 unique bugs
+  Overlap: 1 finding (12.5%)
+
+CONCLUSION: Both tiers are essential. Cold catches UX confusion that an
+  Insider would never notice. Insider catches spec violations and data
+  integrity issues that require domain knowledge. Low overlap confirms
+  the tiers test genuinely different things.
+```
+
+---
+
+*Test Flight conducted by Cowork Opus. Cold + Insider tiers. PhotoSortVision v1.0, macOS.*
 *Part of the [Test Pilot Loop](https://github.com/suhuandds/test-pilot-loop) framework by Huan Su.*
