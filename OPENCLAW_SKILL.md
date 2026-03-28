@@ -168,6 +168,10 @@ When user says "retest", "test again", or "check the fixes":
 3. Report whether the Tier Gap Ratio improved
 4. Continue looping until PASS
 
+### Persistent Looping with Dual-Patrol
+
+For continuous build-test-fix cycles (overnight runs, multi-iteration development), combine this skill with the **Dual-Patrol Model** from the full Test Pilot Loop framework. Both the orchestrator (Cowork Opus) and the coding agent patrol a shared `FLIGHT_PLAN.md` file independently — no direct terminal control needed. The orchestrator writes feedback and `NEXT_ACTION` instructions; the coding agent picks them up, fixes, rebuilds, and signals "ready for retest." See [TEST_PILOT_LOOP.md — The Dual-Patrol Model](https://github.com/suhuandds/test-pilot-loop/blob/main/TEST_PILOT_LOOP.md#the-dual-patrol-model) for setup details.
+
 ## Rules
 
 1. Always test through computer use, not by reading source code
