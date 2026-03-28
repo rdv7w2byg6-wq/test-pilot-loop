@@ -176,6 +176,8 @@ This framework requires **Claude with computer use capability:**
 
 **Key:** The app must be on the **same Mac** where Cowork is running and **visible on screen** (not minimized). Cowork interacts with what it can see.
 
+> **Architecture note:** In this reference implementation, Cowork does not directly operate coding-agent terminals. Coordination happens through `FLIGHT_PLAN.md`, with the coding agent responsible for polling the file, acting on instructions, and reporting back. See [The Dual-Patrol Model](TEST_PILOT_LOOP.md#the-dual-patrol-model) for details.
+
 The Test Pilot Loop is not a fully automated plug-and-play system (yet). It's a governed framework that requires a human director to launch the app, set up sessions, and make final calls. The AI handles the testing; you handle the setup.
 
 > **Note:** The methodology is agent-agnostic. This repo is a reference implementation using Claude Code + Cowork. The concepts (persona-based testing, knowledge tiers, structured feedback loops) can be adapted to other AI agents with computer use capabilities.

@@ -71,9 +71,19 @@ Same Opus instance, but each run is **prompted with only that tier's allowed kno
 
 ---
 
-## The Communication Channel
+## The Dual-Patrol Model
 
-Cowork Opus and the code agent communicate through a shared file: `FLIGHT_DECK/FLIGHT_PLAN.md` (or any shared .md file both can read/write).
+Cowork and the code agent are **two independent processes** that never interact directly. They communicate exclusively through a shared file: `FLIGHT_DECK/FLIGHT_PLAN.md`.
+
+**Cowork Opus** is the brain and test pilot. It patrols `FLIGHT_PLAN.md` every 10 minutes, looking for "Ready for test." When it finds one, it switches to test mode — finds the app on screen, runs the three knowledge-level tests through computer use, writes structured feedback back to the file, and returns to patrol.
+
+**Claude Code** (or any coding agent) is the builder. It builds features, runs tests, launches the app, and writes "Ready for test" to the shared file. Then it polls the same file on its own 10-minute cycle. When it finds feedback and a `NEXT_ACTION`, it reads the instructions, fixes the issues, rebuilds, relaunches, and writes "Ready for retest."
+
+Neither agent commands the other. Cowork cannot type into Terminal (platform safety boundary), and doesn't need to — the file is the only coordination channel. If an agent stops responding, the other writes an escalation to the file and the human director intervenes.
+
+This architecture is portable: any coding agent that can read and write a markdown file (Claude Code, Codex CLI, Cursor, etc.) can serve as the builder side.
+
+### The Communication Channel
 
 ```
 CODE AGENT writes:
@@ -203,7 +213,7 @@ For Xcode projects, Cowork Opus can build and launch the app directly by clickin
 
 This avoids any Terminal typing. The build happens either through Xcode menu clicks or through Claude Code's earlier command line invocation.
 
-### The Dual-Patrol Model
+### Dual-Patrol in Detail
 
 Both agents patrol `FLIGHT_PLAN.md` independently every 10 minutes. Neither agent needs to interact with the other directly — they communicate purely through the shared file using STATUS codes and NEXT_ACTION instructions.
 

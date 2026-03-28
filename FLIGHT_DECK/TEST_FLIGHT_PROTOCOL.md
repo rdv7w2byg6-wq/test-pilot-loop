@@ -88,6 +88,28 @@ CLI-Anything is optional. All phases work with hand-written CLI commands.
 
 ---
 
+## Pre-Flight: Visible Window Check
+
+Before any testing begins, confirm the target app is visible and ready for computer use interaction.
+
+```
+VISIBLE WINDOW CHECK
+════════════════════
+□ App is running (not just built — actually launched)
+□ App window is visible on screen (not minimized, not behind other windows)
+□ App window is large enough to interact with (not a sliver)
+□ For iOS: Simulator is in foreground with the app active
+□ For web: Browser tab is active and page has loaded
+□ For CLI apps: Terminal window is visible with the app's output showing
+
+If any check fails → stop. Ask the human director to bring the app
+window to the foreground, or ask Claude Code to relaunch it.
+```
+
+**Why this matters:** The Test Pilot operates through computer use — it can only see and interact with what's on screen. A minimized window, a background tab, or an app that built but never launched will produce a failed test with zero useful signal.
+
+---
+
 ## Phase 0: Ground Check (CLI + Accessibility API)
 
 Run before launching visual inspection. Each takes seconds.
