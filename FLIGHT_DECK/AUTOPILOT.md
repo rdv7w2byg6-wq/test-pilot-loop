@@ -25,7 +25,128 @@ Write code that not only works — but that a confused first-time user can figur
 | `FLIGHT_DECK/PREFLIGHT_CHECK.md` | Testing depth settings — personas, tiers, thresholds | Read once to know current project testing level |
 | `FLIGHT_DECK/TEST_FLIGHT_PROTOCOL.md` | How the test pilot tests screen by screen | Read once to understand the execution cycle |
 | `FLIGHT_DECK/FLIGHT_LOG.md` | Cross-run metrics, Tier Gap tracking, UX phase testing | Read once to understand how UX quality is measured across tiers |
+| `FLIGHT_DECK/INSIDER_TESTING_SKILL.md` | Insider testing methodology — Five Lenses, 8 phases, oracles, outcome verification | Read once. This is how Insider tier testing works. |
+| `FLIGHT_DECK/INSIDER_GOALS.md` | Project-specific testing playbook (generated from Phase 0 Q&A) | **Test pilot reads before every test flight.** Created during Step 1.5. |
 | This file (`AUTOPILOT.md`) | Your rules of engagement | You already loaded this |
+
+---
+
+## 🔓 Pre-Flight Permissions (Required — Do This First)
+
+The Test Pilot Loop is an **autonomous build-test-fix cycle**. Claude Code must be able to edit files, run builds, and update FLIGHT_PLAN.md without stopping to ask the human for permission on every action. If permissions are not pre-configured, every tool call prompts the human — breaking the loop and defeating the purpose.
+
+**In a real loop run (PhotoSortVision, 8 iterations, 19 bugs), Claude Code triggered 50+ permission prompts.** Each one stalled the loop until the human approved. That's not autonomous — it's a human approving an assembly line one screw at a time.
+
+### What to Configure
+
+Before saying "start test pilot loop," the human director must add these permissions to the project's `.claude/settings.local.json`:
+
+```json
+{
+  "permissions": {
+    "allow": [
+      "Edit",
+      "Write(FLIGHT_DECK/*)",
+      "Write(.claude/agents/*)",
+      "Bash(xcodebuild*)",
+      "Bash(fswatch*)",
+      "Bash(mkdir*)",
+      "Bash(cp*)",
+      "Bash(ls*)",
+      "Bash(wc*)",
+      "Bash(date*)",
+      "Bash(which*)",
+      "Bash(brew install fswatch)"
+    ]
+  }
+}
+```
+
+Adjust for your build tool:
+
+| Project Type | Build Permission |
+|---|---|
+| macOS/iOS (Xcode) | `Bash(xcodebuild*)` |
+| Web (Node) | `Bash(npm*)`, `Bash(npx*)` |
+| Python | `Bash(python*)`, `Bash(pip*)`, `Bash(pytest*)` |
+| Rust | `Bash(cargo*)` |
+| Go | `Bash(go*)` |
+| General | `Bash(make*)`, `Bash(cmake*)` |
+
+### Why This Matters
+
+Without pre-approved permissions, the loop flow is:
+
+```
+Cowork writes feedback → fswatch fires → Claude Code wakes →
+  → tries to edit file → ⏸️  BLOCKED: "Allow Edit?" → human approves →
+  → tries to build → ⏸️  BLOCKED: "Allow xcodebuild?" → human approves →
+  → tries to update FLIGHT_PLAN.md → ⏸️  BLOCKED: "Allow Write?" → human approves →
+  → 3 approvals per fix × 5 bugs × 8 iterations = 120 interruptions
+```
+
+With pre-approved permissions:
+
+```
+Cowork writes feedback → fswatch fires → Claude Code wakes →
+  → edits file → builds → updates FLIGHT_PLAN.md → done
+  → total time: seconds, not minutes
+```
+
+### Cowork (Test Pilot) Permissions
+
+Cowork uses computer use (`request_access`) to control apps on the user's Mac. Without pre-granting apps, every test flight triggers multiple permission dialogs — one per app, mid-test.
+
+**At session start, Cowork must `request_access` for ALL apps it will need during the loop:**
+
+| App | Why | Tier |
+|-----|-----|------|
+| **Your app** (e.g., PhotoSortVision) | Test the app through computer use | full |
+| **Finder** | Verify folders, check file counts, open output | full |
+| **Preview** | Inspect photos, verify transforms, check output | full |
+| **Xcode** | Clean Build Folder, run builds (click-only) | click |
+| **Terminal** | Monitor Claude Code progress (click-only) | click |
+
+Also request: `clipboardRead`, `clipboardWrite`, `systemKeyCombos`.
+
+**Do this in ONE `request_access` call at session start — not piecemeal during testing.** The human approves once, then the entire test flight runs uninterrupted.
+
+Without pre-granted access:
+```
+Cowork starts test → opens app → ⏸️  "Allow PhotoSortVision?" → human approves →
+  → checks Finder → ⏸️  "Allow Finder?" → human approves →
+  → opens photo in Preview → ⏸️  "Allow Preview?" → human approves →
+  → 3 prompts per test × 8 iterations = 24 interruptions
+```
+
+With pre-granted access:
+```
+Cowork starts test → opens app → clicks through → checks Finder → done
+  → zero interruptions
+```
+
+### Security Note
+
+These permissions are scoped to the project directory. Claude Code cannot modify files outside the project, run arbitrary network commands, or access system resources beyond what's listed. The human director retains kill-switch authority via `GLOBAL_STOP: FROZEN` in FLIGHT_PLAN.md.
+
+Cowork's computer-use access is scoped to the granted apps only — it cannot see or interact with apps outside the allowlist. The human can revoke access at any time.
+
+### Verification
+
+After configuring permissions, test by running:
+```
+Claude Code:
+  Edit a comment in any source file → should not prompt
+  Run the build command → should not prompt
+  Write to FLIGHT_DECK/FLIGHT_PLAN.md → should not prompt
+
+Cowork:
+  Open the app → should not prompt
+  Open Finder → should not prompt
+  Take a screenshot → should show all granted apps
+```
+
+If any of these prompt for approval, the permissions are not configured correctly. Fix before starting the loop.
 
 ---
 
@@ -43,6 +164,20 @@ Before writing any code or setting up patrol, Claude Code **MUST** read:
 **Do NOT start building until you understand the full project.** The Test Pilot will test every function against the spec. If you don't know the spec, you'll build it wrong.
 
 **On first setup:** If the Flight Deck files don't exist in your project yet, read them from the framework repo (the Test Pilot Loop source), then copy `AUTOPILOT.md` into your project's `FLIGHT_DECK/` and persona agent files into `.claude/agents/`. Update `CLAUDE.md` to reference `@FLIGHT_DECK/AUTOPILOT.md`.
+
+### Step 1.5: Goal Discovery Q&A (MANDATORY — Insider Skill)
+
+**After reading the spec but BEFORE setting up patrol**, Claude Code conducts a **6-question Q&A** with the human director. This generates `FLIGHT_DECK/INSIDER_GOALS.md` — the project-specific testing playbook that tells the test pilot what "correct" looks like, where to verify output, which datasets exist, and what the human is most worried about.
+
+**Full protocol:** See `FLIGHT_DECK/INSIDER_TESTING_SKILL.md` → Phase 0.
+
+**Quick summary:**
+1. Claude Code generates Q1-Q5 from the spec (goal verification, failure investigation, test data, critical settings, out-of-scope features)
+2. Q6 is always: "Why are you testing?"
+3. Answers are compiled into `FLIGHT_DECK/INSIDER_GOALS.md`
+4. The test pilot reads INSIDER_GOALS.md before every test flight
+
+**Skip conditions:** Only skip if the human explicitly says to skip, or if the app is not yet built enough to produce meaningful output for verification.
 
 ### Step 2: Set Up Auto-Patrol (MANDATORY)
 

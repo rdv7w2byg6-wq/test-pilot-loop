@@ -365,9 +365,13 @@ The cycle is identical for all tiers. Only the PREDICT and EVALUATE steps change
 | **EVALUATE** | "Did it do what I guessed?" | "Did it match the manual?" | "Did it meet the spec?" |
 | **COVERAGE** | Whatever you find on screen | Whatever the manual mentions | **Every element in the spec — exhaustive** |
 
-### Insider: Exhaustive Element Testing (MANDATORY)
+### Insider: Exhaustive Element Testing + Outcome Verification (MANDATORY)
 
 Cold and Guided tiers test what they encounter organically. The Insider tier is different — **it must test everything in the spec, not just what it stumbles across.** This is the most extensive test the framework performs.
+
+> **📋 Full Insider methodology:** See `FLIGHT_DECK/INSIDER_TESTING_SKILL.md` for the complete Insider testing protocol — Five Lenses, 8-phase testing cycle, oracles, adaptive pivot, risk map, and outcome-focused verification. The skill document is the Insider's operating manual.
+>
+> **Key principle:** 60% of Insider testing time is spent on **outcome verification** (checking the actual output in Finder/filesystem), not clicking UI elements. The UI is the means; the output is the ground truth. If `INSIDER_GOALS.md` exists, the Insider reads it before every test flight.
 
 #### Pre-Flight: Read the Full Spec First
 

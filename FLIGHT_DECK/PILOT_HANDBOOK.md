@@ -62,7 +62,7 @@ The Test Pilot doesn't test as "an AI." It tests as **specific human personas** 
 |------|------|---------------|----------------|
 | 🔴 **Tier 1** (Cold User) | `test-pilot-tier1-cold.md` | App name ONLY | Discoverability, first impressions, learnability |
 | 🟡 **Tier 2** (Guided User) | `test-pilot-tier2-guided.md` | User manual only | Documentation accuracy, instruction followability. **⚠️ Only deploy when a user guide/manual/handbook exists.** |
-| 🟢 **Tier 3** (Insider) | `test-pilot-tier3-insider.md` | Full PRD | Spec compliance, feature completeness, acceptance criteria, **exhaustive element audit — every button/toggle/preview in the spec must be clicked and verified** |
+| 🟢 **Tier 3** (Insider) | `test-pilot-tier3-insider.md` + `INSIDER_TESTING_SKILL.md` | Full PRD + INSIDER_GOALS.md | Spec compliance, feature completeness, **outcome verification (check output in Finder), failure investigation, 5-lens evaluation, exhaustive element audit** |
 
 ### What Each Tier Uniquely Does (That the Others Can't)
 
@@ -70,18 +70,23 @@ The Test Pilot doesn't test as "an AI." It tests as **specific human personas** 
 |------|--------------------|--------------------|
 | **Cold** | First impressions and discoverability — can a stranger figure it out? | The Insider already knows the app. The Guided user has the manual. Only the Cold user is truly lost. |
 | **Guided** | Manual accuracy cross-check — does the documentation match reality? | Only the Guided user reads the manual and compares it to what's on screen. Manual says "click the green button on the top right" but it's actually a blue button on the bottom left — only Guided catches this. |
-| **Insider** | Exhaustive spec compliance — is every function built and working? | Only the Insider has the full spec and can verify every button, toggle, and expected outcome against it. Catches all functional bugs the other tiers would also find, plus spec gaps they'd miss entirely. |
+| **Insider** | Exhaustive spec compliance + **outcome verification** — is every function built, working, AND producing the correct result? | Only the Insider has the full spec, INSIDER_GOALS.md, and the Five Lenses (Works? Achieves goal? Hard to use? Makes sense? What else?). Verifies output in Finder, investigates failures, checks the actual files — not just the UI. See `FLIGHT_DECK/INSIDER_TESTING_SKILL.md`. |
 
-### Insider Pre-Flight: Read Everything, Test Everything
+### Insider Pre-Flight: Read Everything, Test Everything, Verify the Output
 
 The Insider performs the most extensive test possible. Before testing any screen, the Insider **must**:
 
-1. **Read the full spec** — `CLAUDE.md`, `PRD.md`, and any referenced spec files. This gives complete knowledge of every screen, every button, every toggle, every state transition, and every expected outcome.
-2. **Build a complete element checklist per screen** — extract every interactive element from the spec section for that screen: buttons, toggles, dropdowns, text fields, sliders, drag targets, context menus, keyboard shortcuts, live previews, cards, badges, links, state transitions.
-3. **Test every element** — click/activate each one, verify it does what the spec says, check dependent UI updates, verify state transitions between screens.
-4. **Track coverage** — report how many spec elements were tested vs. how many exist. Every skipped element must be reported with a reason.
+1. **Read the full spec** — `CLAUDE.md`, `PRD.md`, and any referenced spec files.
+2. **Read INSIDER_GOALS.md** (if it exists) — the project-specific testing playbook generated from Phase 0 Q&A. This tells you what "correct" looks like, where to verify output, which datasets exist, and what the human is most worried about.
+3. **Build a complete element checklist per screen** — extract every interactive element from the spec.
+4. **Test every element** — click/activate each one, verify it does what the spec says.
+5. **Verify the output** — after running the full workflow, **leave the app and check the actual output** (Finder, filesystem, database). The UI claiming success is not verification.
+6. **Investigate failures** — for every item in the failure/review bucket, determine WHY it's there.
+7. **Track coverage** — report elements tested vs. total. Every skipped element needs a reason.
 
-This is not a suggestion — it's the Insider's core job. Without it, bugs ship. See `test-pilot-tier3-insider.md` for the full protocol.
+**The Insider uses the Five Lenses** on every screen and feature: (1) Does it work? (2) Does it achieve the goal? (3) Is it hard to use? (4) Does it make sense? (5) What else?
+
+**Full methodology:** See `FLIGHT_DECK/INSIDER_TESTING_SKILL.md` for the complete 8-phase protocol, oracles, adaptive pivot, risk map, and anti-patterns.
 
 ### Deployment Logic
 

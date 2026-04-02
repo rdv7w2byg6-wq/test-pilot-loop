@@ -114,13 +114,13 @@ Why: if a cold user can complete the task, UX is good enough. Fastest signal.
 ```
 Why: the gap between these two IS the Tier Gap Ratio. Skipping Tier 2 saves time while still measuring the knowledge gap.
 
-**Insider Only — Exhaustive Spec Audit (1 tier)**
+**Insider Only — Exhaustive Spec Audit + Outcome Verification (1 tier)**
 ```
   ❌ Tier 1 — Cold User — skipped
   ❌ Tier 2 — Guided User — skipped
-  ✅ Tier 3 — Insider (exhaustive element audit)
+  ✅ Tier 3 — Insider (exhaustive element audit + outcome verification)
 ```
-Why: the Insider tests every function, every button, every expected outcome against the spec. Catches all functional bugs, spec deviations, and missing features. Other tiers only add UX perspective (first impressions, documentation accuracy) — they don't find bugs the Insider wouldn't. Best for: professional/trained-user apps where users know the workflow (e.g., dental practice software, internal tools, B2B apps). Skips discoverability testing since your users will be trained.
+Why: the Insider tests every function against the spec AND verifies the actual output (opens Finder, checks files, investigates failures). Uses the Five Lenses: Works? Achieves goal? Hard to use? Makes sense? What else? Catches all functional bugs plus logic issues other tiers would miss. Best for: professional/trained-user apps where users know the workflow (e.g., dental practice software, internal tools, B2B apps). See `FLIGHT_DECK/INSIDER_TESTING_SKILL.md` for the full 8-phase protocol.
 
 **What you trade away:** Cold tier first-impression testing (would a stranger figure this out?) and Guided tier documentation testing (does the manual match reality?). For consumer apps, those matter. For professional tools with trained users, they're noise.
 
